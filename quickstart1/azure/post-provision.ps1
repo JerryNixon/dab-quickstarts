@@ -16,15 +16,10 @@ $webUrl            = $env:AZURE_WEB_APP_URL
 $webFqdn           = $env:AZURE_WEB_APP_FQDN
 $dabAppName        = $env:AZURE_CONTAINER_APP_API_NAME
 $dabFqdn           = $env:AZURE_CONTAINER_APP_API_FQDN
+$inspectorName     = $env:AZURE_MCP_INSPECTOR_NAME
+$inspectorFqdn     = $env:AZURE_MCP_INSPECTOR_FQDN
 
-$sqlConn = "Server=tcp:$sqlServerFqdn,1433;Database=$sqlDb;User Id=$sqlAdminUser;Password=$sqlAdminPassword;Encrypt=true;TrustServerCertificate=false"
-
-# Ensure SqlServer module (Invoke-Sqlcmd) is available
-if (-not (Get-Module -ListAvailable -Name SqlServer)) {
-    Write-Host "Installing SqlServer module..." -ForegroundColor Yellow
-    Install-Module SqlServer -Scope CurrentUser -Force -AllowClobber -ErrorAction Stop | Out-Null
-}
-Import-Module SqlServer -DisableNameChecking -ErrorAction Stop
+$sqlConn = "Server=tcp:$sqlServerFqdn,1433;Database=$sqlDb;User Id=$sqlAdminUser;Password=$sqlAdminPassword;Encrypt=true;TrustServerCertificate=true"
 
 # ── 1. Open SQL firewall for local machine ──
 
@@ -38,17 +33,35 @@ az sql server firewall-rule create `
     --end-ip-address $myIp 2>$null | Out-Null
 Write-Host "Firewall rule added ($myIp)" -ForegroundColor Green
 
-# ── 2. Deploy database schema ──
+# ── 2. Deploy database schema (dacpac) ──
 
-Write-Host "Deploying schema..." -ForegroundColor Yellow
-$schemaSql = Get-Content -Path "database.sql" -Raw
-Invoke-Sqlcmd -ConnectionString $sqlConn -Query $schemaSql
+Write-Host "Building database project..." -ForegroundColor Yellow
+dotnet build database/database.sqlproj -c Release
+if ($LASTEXITCODE -ne 0) { throw "Database build failed" }
+Write-Host "Database built" -ForegroundColor Green
+
+Write-Host "Deploying schema with sqlpackage..." -ForegroundColor Yellow
+sqlpackage /Action:Publish `
+    /SourceFile:database/bin/Release/database.dacpac `
+    /TargetConnectionString:"$sqlConn" `
+    /p:BlockOnPossibleDataLoss=false
+if ($LASTEXITCODE -ne 0) { throw "Schema deployment failed" }
 Write-Host "Schema deployed" -ForegroundColor Green
 
 # ── 3. Build and push DAB image to ACR ──
 
+Write-Host "Preparing DAB config with Azure CORS..." -ForegroundColor Yellow
+$apiDeployDir = "api-deploy-temp"
+Copy-Item -Path "api" -Destination $apiDeployDir -Recurse -Force
+$webOrigin = "https://$webFqdn"
+$dabConfig = Get-Content -Path "$apiDeployDir/dab-config.json" -Raw
+$dabConfig = $dabConfig.Replace("__WEB_URL_AZURE__", $webOrigin)
+$dabConfig | Out-File -FilePath "$apiDeployDir/dab-config.json" -Encoding utf8 -Force
+Write-Host "CORS origin set to $webOrigin" -ForegroundColor Green
+
 Write-Host "Building DAB image in ACR..." -ForegroundColor Yellow
-az acr build --registry $acrName --image dab-api:latest --file api/Dockerfile api/ | Out-Null
+az acr build --registry $acrName --image dab-api:latest --file "$apiDeployDir/Dockerfile" $apiDeployDir/ | Out-Null
+Remove-Item $apiDeployDir -Recurse -Force
 Write-Host "Image pushed" -ForegroundColor Green
 
 # ── 4. Update DAB container app with custom image ──
@@ -91,7 +104,22 @@ az containerapp update `
     --image "$acrName.azurecr.io/web-app:latest" | Out-Null
 Write-Host "Web updated" -ForegroundColor Green
 
-# ── 6. Update local config.js for dev ──
+# ── 7. Build and push MCP Inspector image to ACR ──
+
+Write-Host "Building MCP Inspector image in ACR..." -ForegroundColor Yellow
+az acr build --registry $acrName --image mcp-inspector:latest --file inspector/Dockerfile inspector/ | Out-Null
+Write-Host "Inspector image pushed" -ForegroundColor Green
+
+# ── 8. Update MCP Inspector container app with custom image ──
+
+Write-Host "Updating MCP Inspector container app..." -ForegroundColor Yellow
+az containerapp update `
+    --name $inspectorName `
+    --resource-group $resourceGroup `
+    --image "$acrName.azurecr.io/mcp-inspector:latest" | Out-Null
+Write-Host "Inspector updated" -ForegroundColor Green
+
+# ── 9. Update local config.js for dev ──
 
 $configContent | Out-File -FilePath "web/config.js" -Encoding utf8 -Force
 Write-Host "Local config.js updated" -ForegroundColor Green
@@ -102,3 +130,4 @@ Write-Host "`n=== Deployment Complete ===" -ForegroundColor Cyan
 Write-Host "Web:           $webUrl" -ForegroundColor White
 Write-Host "API:           $apiUrlAzure" -ForegroundColor White
 Write-Host "SQL Commander: https://$($env:AZURE_CONTAINER_APP_SQLCMDR_FQDN)" -ForegroundColor White
+Write-Host "MCP Inspector: https://$inspectorFqdn" -ForegroundColor White

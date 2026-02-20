@@ -7,6 +7,8 @@ description: Add SQL Commander to a .NET Aspire AppHost for browsing and queryin
 
 Add SQL Commander as an Aspire-managed container so it auto-starts alongside your SQL Server, appears in the dashboard, and is accessible in the browser without manual setup. SQL Commander is a lightweight web-based SQL query tool for SQL Server.
 
+For Azure deployment, see the `azure-sql-commander` skill.
+
 ## Documentation references
 
 - https://hub.docker.com/r/jerrynixon/sql-commander
@@ -51,6 +53,8 @@ SQL Commander expects a single environment variable:
 ```
 ConnectionStrings__db=Server=<host>;Database=<name>;User Id=sa;Password=<password>;TrustServerCertificate=true
 ```
+
+> **CRITICAL:** `TrustServerCertificate=true` is **required**. SQL Commander will not connect without it — locally or in Azure. Always include it in the connection string.
 
 **In Aspire, pass the database resource directly:**
 
@@ -175,73 +179,6 @@ var options = new
     SqlCmdrImage = "latest",
 };
 ```
-
----
-
-## Docker Compose Equivalent
-
-For reference, the equivalent Docker Compose service:
-
-```yaml
-sql-cmdr:
-  image: jerrynixon/sql-commander:latest
-  container_name: sql-cmdr
-  restart: unless-stopped
-  environment:
-    - ConnectionStrings__db=${SQL_COMMANDER_CONNECTION_STRING}
-  ports:
-    - "8080:8080"
-  depends_on:
-    sql-2025:
-      condition: service_healthy
-```
-
-In Docker Compose, use the SQL service name (e.g., `Server=sql-2025`) in the connection string, and ensure the database schema is deployed with `sqlpackage` before opening Commander.
-
----
-
-## Azure Deployment (Bicep)
-
-SQL Commander deploys as an Azure Container App alongside DAB and the web app:
-
-```bicep
-resource sqlCmdr 'Microsoft.App/containerApps@2024-03-01' = {
-  name: 'sql-commander-${resourceToken}'
-  location: location
-  tags: tags
-  properties: {
-    managedEnvironmentId: cae.id
-    configuration: {
-      ingress: {
-        external: true
-        targetPort: 8080
-      }
-      secrets: [
-        { name: 'db-conn', value: sqlConnString }
-      ]
-    }
-    template: {
-      containers: [
-        {
-          name: 'sql-commander'
-          image: 'docker.io/jerrynixon/sql-commander:latest'
-          resources: { cpu: json('0.25'), memory: '0.5Gi' }
-          env: [
-            { name: 'ConnectionStrings__db', secretRef: 'db-conn' }
-          ]
-        }
-      ]
-      scale: { minReplicas: 0, maxReplicas: 1 }
-    }
-  }
-}
-```
-
-**Key points:**
-- `minReplicas: 0` — scales to zero when idle (cost saving)
-- `maxReplicas: 1` — only one instance needed for a dev/admin tool
-- Connection string stored as a Container Apps secret, referenced via `secretRef`
-- Ingress is `external: true` so it's accessible from the browser
 
 ---
 
