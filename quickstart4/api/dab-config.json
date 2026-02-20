@@ -23,7 +23,7 @@
       "cors": {
         "origins": [
           "http://localhost:5173",
-          "https://web-app-202602181644.whiterock-6b8e3e08.centralus.azurecontainerapps.io"
+          "__WEB_URL_AZURE__"
         ],
         "allow-credentials": false
       },
