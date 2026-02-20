@@ -10,7 +10,6 @@ var options = new
     SqlServer = "qs1-sql-server",
     SqlVolume = "qs1-sql-data",
     SqlDatabase = "TodoDb",
-    SqlSchema = Path.Combine(root, "database.sql"),
     DataApi = "qs1-data-api",
     DabConfig = Path.Combine(root, "api", "dab-config.json"),
     DabImage = "1.7.83-rc",
@@ -28,8 +27,11 @@ var sqlServer = builder
     .WithEnvironment("ACCEPT_EULA", "Y");
 
 var sqlDatabase = sqlServer
-    .AddDatabase(options.SqlDatabase)
-    .WithCreationScript(File.ReadAllText(options.SqlSchema));
+    .AddDatabase(options.SqlDatabase);
+
+var sqlDatabaseProject = builder
+    .AddSqlProject<Projects.database>("qs1-sql-project")
+    .WithReference(sqlDatabase);
 
 var apiServer = builder
     .AddContainer(options.DataApi, image: "azure-databases/data-api-builder", tag: options.DabImage)
@@ -47,7 +49,7 @@ var apiServer = builder
     .WithOtlpExporter()
     .WithParentRelationship(sqlDatabase)
     .WithHttpHealthCheck("/health")
-    .WaitFor(sqlDatabase);
+    .WaitFor(sqlDatabaseProject);
 
 var sqlCommander = builder
     .AddContainer(options.SqlCmdr, "jerrynixon/sql-commander", options.SqlCmdrImage)
@@ -61,7 +63,7 @@ var sqlCommander = builder
     })
     .WithParentRelationship(sqlDatabase)
     .WithHttpHealthCheck("/health")
-    .WaitFor(sqlDatabase);
+    .WaitFor(sqlDatabaseProject);
 
 var webApp = builder
     .AddContainer(options.WebApp, "nginx", "alpine")
@@ -74,5 +76,15 @@ var webApp = builder
         context.Urls.Add(new() { Url = "/", DisplayText = "Web App", Endpoint = context.GetEndpoint("http") });
     })
     .WaitForCompletion(apiServer);
+
+var mcpInspector = builder
+    .AddMcpInspector("mcp-inspector", options =>
+    {
+        options.InspectorVersion = "0.20.0";
+    })
+    .WithMcpServer(apiServer, transportType: McpTransportType.StreamableHttp)
+    .WithParentRelationship(apiServer)
+    .WithEnvironment("DANGEROUSLY_OMIT_AUTH", "true")
+    .WaitFor(apiServer);
 
 await builder.Build().RunAsync();
