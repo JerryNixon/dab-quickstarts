@@ -1,5 +1,5 @@
 ---
-name: data-api-builder-aspire
+name: aspire-data-api-builder
 description: Guide for .NET Aspire orchestration of SQL Server + Data API Builder + SQL Commander + MCP Inspector. Use when asked to create an Aspire-based DAB environment.
 ---
 

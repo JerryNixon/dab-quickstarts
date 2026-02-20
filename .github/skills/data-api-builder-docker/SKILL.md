@@ -1,6 +1,6 @@
 ---
 name: data-api-builder-docker
-description: Guide for Docker Compose setup of SQL Server + Data API Builder + SQL Commander + MCP Inspector. Use when asked to create a local Docker dev environment for DAB.
+description: Docker Compose orchestration of SQL Server, Data API Builder, SQL Commander, and MCP Inspector. Use when asked to create docker-compose.yml, set up local containers, or run DAB without Aspire.
 ---
 
 # Docker SQL Server + DAB + MCP Inspector (Local Dev)
