@@ -24,11 +24,8 @@ This eliminates stored database credentials and is the recommended baseline for 
 flowchart LR
     U[User]
 
-    subgraph App Service
-        W[Web App]
-    end
-
     subgraph Azure Container Apps
+        W[Web App]
         A[Data API builder]
     end
 

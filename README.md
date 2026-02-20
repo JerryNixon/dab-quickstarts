@@ -16,11 +16,8 @@ Each step tightens identity and shifts enforcement closer to the data.
 flowchart LR
     U[User]
 
-    subgraph App Service
-        W[Web App]
-    end
-
     subgraph Azure Container Apps
+        W[Web App]
         A[Data API builder]
     end
 
@@ -55,11 +52,8 @@ This is the most basic configuration. It demonstrates the request flow and how D
 flowchart LR
     U[User]
 
-    subgraph App Service
-        W[Web App]
-    end
-
     subgraph Azure Container Apps
+        W[Web App]
         A[Data API builder]
     end
 
@@ -97,11 +91,8 @@ flowchart LR
         E[App Registration]
     end
 
-    subgraph App Service
-        W[Web App]
-    end
-
     subgraph Azure Container Apps
+        W[Web App]
         A[Data API builder]
     end
 
@@ -131,11 +122,8 @@ flowchart LR
         E[App Registration]
     end
 
-    subgraph App Service
-        W[Web App]
-    end
-
     subgraph Azure Container Apps
+        W[Web App]
         A[Data API builder<br/><i>With Database Policy</i>]
     end
 
@@ -192,11 +180,8 @@ flowchart LR
         E[App Registration]
     end
 
-    subgraph App Service
-        W[Web App]
-    end
-
     subgraph Azure Container Apps
+        W[Web App]
         A[Data API builder]
     end
 

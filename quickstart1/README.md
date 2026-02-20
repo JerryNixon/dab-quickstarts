@@ -25,12 +25,11 @@ This is the most basic configuration. It demonstrates the request flow and how D
 flowchart LR
     U[User]
 
-    subgraph App Service
-        W[Web App]
-    end
-
     subgraph Azure Container Apps
+        W[Web App]
         A[Data API builder]
+        M[[MCP Inspector]]
+        C[[SQL Commander]]
     end
 
     subgraph Azure SQL
@@ -39,6 +38,8 @@ flowchart LR
 
     U -->|anon| W
     W -->|anon| A
+    M -->|anon| A
+    C -->|SQL Auth| S
     A -->|SQL Auth| S
 ```
 
@@ -78,7 +79,7 @@ azd auth login
 azd up
 ```
 
-This provisions Azure SQL, Container Apps (DAB + SQL Commander), and App Service (web).
+This provisions Azure SQL and Container Apps (DAB, SQL Commander, and web).
 
 ## Database Schema
 

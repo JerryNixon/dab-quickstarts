@@ -29,11 +29,8 @@ flowchart LR
         E[App Registration]
     end
 
-    subgraph App Service
-        W[Web App]
-    end
-
     subgraph Azure Container Apps
+        W[Web App]
         A[Data API builder<br/><i>With Database Policy</i>]
     end
 
