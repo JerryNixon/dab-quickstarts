@@ -1,10 +1,14 @@
-name: dab-quickstart4
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+name: dab-mssql-quickstart4
 metadata:
-  template: dab-quickstart4
+  template: dab-mssql-quickstart4
+
 infra:
   provider: bicep
   path: azure
   module: main
+
 hooks:
   preprovision:
     shell: pwsh
