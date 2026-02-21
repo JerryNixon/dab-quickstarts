@@ -139,7 +139,7 @@ The quickstarts form a progressive series. Each one adds complexity:
 - Folder structure must be **identical** across all quickstarts
 - Folder names must match (if you rename in one, rename in all)
 - README format must be consistent
-- `database.sql` kept for historical reference, but `database/` project is authoritative
+- `database/` SQL Database Project is the single source of truth for schema
 - Each quickstart is **self-contained** — can be deployed independently
 
 ---
@@ -197,6 +197,36 @@ $staleNames | ForEach-Object {
     if ($hits) { Write-Warning "Stale reference to '$_' found:"; $hits | ForEach-Object { Write-Warning "  $_" } }
 }
 ```
+
+### .gitignore Validation
+
+Before committing, verify `.gitignore` is correct and no build artifacts will leak into the repo.
+
+**Required ignore patterns:**
+```
+.env
+.azure-env
+.azure/
+dab-config.*.json
+**/bin
+**/obj
+node_modules/
+web-deploy-temp/
+api-deploy-temp/
+web-deploy.zip
+```
+
+> **CRITICAL:** Use `**/bin` and `**/obj` (not `bin/` and `obj/`) — the root-only pattern misses nested project folders like `aspire-apphost/bin/`.
+
+**Count untracked files before committing:**
+```powershell
+# Show how many files git will add
+$untracked = git ls-files --others --exclude-standard
+Write-Host "Untracked files: $($untracked.Count)"
+$untracked
+```
+
+Review the list — every file should be legitimate source. If you see `bin/`, `obj/`, `.env`, or deploy temp folders, fix `.gitignore` before committing. A typical quickstart has ~20-25 source files; significantly more suggests a missing ignore pattern.
 
 ---
 

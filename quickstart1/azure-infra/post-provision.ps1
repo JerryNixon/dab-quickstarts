@@ -107,7 +107,7 @@ Write-Host "Web updated" -ForegroundColor Green
 # ── 7. Build and push MCP Inspector image to ACR ──
 
 Write-Host "Building MCP Inspector image in ACR..." -ForegroundColor Yellow
-az acr build --registry $acrName --image mcp-inspector:latest --file inspector/Dockerfile inspector/ | Out-Null
+az acr build --registry $acrName --image mcp-inspector:latest --file mcp-inspector/Dockerfile mcp-inspector/ | Out-Null
 Write-Host "Inspector image pushed" -ForegroundColor Green
 
 # ── 8. Update MCP Inspector container app with custom image ──

@@ -6,7 +6,7 @@ metadata:
 
 infra:
   provider: bicep
-  path: azure
+  path: azure-infra
   module: main
 
 hooks:
@@ -14,4 +14,4 @@ hooks:
     shell: pwsh
     continueOnError: false
     interactive: true
-    run: ./azure/post-provision.ps1
+    run: ./azure-infra/post-provision.ps1
