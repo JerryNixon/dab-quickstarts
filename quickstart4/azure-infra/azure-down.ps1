@@ -25,6 +25,13 @@ try {
     }
     if ($LASTEXITCODE -ne 0) { throw "azd down failed" }
 
+    # Clean up Entra ID resources (app registration, config resets)
+    $entraDown = Join-Path $PSScriptRoot "entra-down.ps1"
+    if (Test-Path $entraDown) {
+        Write-Host "Running Entra teardown..." -ForegroundColor Yellow
+        & $entraDown
+    }
+
     $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "../..")).Path
     $mcpFile = Join-Path $repoRoot ".github/mcp.json"
     $mcpServerName = "azure-sql-mcp-qs4"
