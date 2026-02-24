@@ -22,8 +22,6 @@ quickstart<N>/
   ├── .gitignore                # Must exclude .env, **\bin, **\obj
   ├── .config/
   │   └── dotnet-tools.json     # Tool manifest (dab, sqlpackage)
-  ├── .vscode/
-  │   └── mcp.json              # MCP server config for Copilot
   ├── aspire-apphost/           # .NET Aspire orchestration
   │   ├── Aspire.AppHost.csproj
   │   └── Program.cs
@@ -47,9 +45,15 @@ quickstart<N>/
   │   ├── styles.css
   │   └── Dockerfile
   └── azure-infra/              # Azure deployment (Bicep + scripts)
+    ├── azure-up.ps1
+    ├── azure-down.ps1
       ├── main.bicep
       ├── resources.bicep
       └── post-provision.ps1
+
+# Repo root runtime utilities
+reset.ps1                        # Resets quickstarts to demo-ready defaults
+.github/mcp.json                 # Workspace MCP registry for Azure quickstarts (created on demand)
 ```
 
 ---
@@ -110,7 +114,7 @@ Each quickstart README follows this structure:
 7. **Connection String Example** — Formatted connection string for the pattern
 8. **Prerequisites** — Links to required tools
 9. **Run Locally** — Exact commands (`dotnet tool restore`, `aspire run`)
-10. **Deploy to Azure** — Exact commands (`azd auth login`, `azd up`)
+10. **Deploy to Azure** — Exact commands (`pwsh ./azure-infra/azure-up.ps1`)
 11. **Database Schema** — Mermaid ERD matching the SQL Database Project
 12. **Next Steps** — Links to other quickstarts
 
@@ -120,6 +124,34 @@ Each quickstart README follows this structure:
 - **Architecture diagrams use service names** — no ports, no versions
 - **Auth matrix must match the actual implementation** — verify against `dab-config.json` and Bicep
 - **Keep it under 120 lines** — concise is better
+
+## Azure Naming and Tagging Standards
+
+For Azure deployments, these rules are mandatory:
+
+- **Token format:** use UTC timestamp `yyyyMMddHHmm` (example: `202602230559`) for readable resource suffixes.
+- **Owner tag required:** every Azure resource that supports tags must include `owner`.
+- **Owner value source:** derive from signed-in user alias (left side of `@` from `az account show --query user.name -o tsv`).
+    - Example: `jnixon@domain.com` → `owner: jnixon`
+- **Tag propagation:** define `owner` once in `azure-infra/main.bicep` `tags` and pass it to all resources/modules.
+- **Script entrypoints:** use `azure-infra/azure-up.ps1` and `azure-infra/azure-down.ps1`.
+- **No legacy wrappers:** do not create or reference `aspire-up.ps1` / `aspire-down.ps1` in `azure-infra`.
+
+## MCP Registry Standards
+
+- Azure deployments register MCP servers in **repo-root** `.github/mcp.json` (not per-quickstart files).
+- Server names must be deterministic per quickstart:
+    - `azure-sql-mcp-qs1`, `azure-sql-mcp-qs2`, `azure-sql-mcp-qs3`, `azure-sql-mcp-qs4`, `azure-sql-mcp-qs5`
+- Server URL format: `https://<dab-fqdn>/mcp`
+- `azure-up.ps1` flow: create/update the quickstart server entry without altering other user entries.
+- `azure-down.ps1` flow: remove only that quickstart server entry, preserving all others.
+
+## Reset Workflow Standards
+
+- Maintain a repo-root `reset.ps1` that returns quickstarts to demo-ready state.
+- Reset should remove run-specific artifacts (such as `.azure`, `.azure-env`, deploy-temp folders, temp JSON files).
+- Reset should restore `web-app/config.js` placeholders per quickstart.
+- Reset should remove `azure-sql-mcp-qs*` entries from `.github/mcp.json` without removing user-defined servers.
 
 ---
 
@@ -187,6 +219,33 @@ $files = @(
 $files | ForEach-Object { if (!(Test-Path $_)) { Write-Warning "Missing: $_" } }
 ```
 
+### Azure Tag Validation
+
+```powershell
+# Verify owner tag wiring in templates
+Get-ChildItem quickstart*\azure-infra\main.bicep | Select-String -Pattern "ownerAlias|owner:|var tags" | Out-Host
+```
+
+```powershell
+# Verify token + owner env setup in deployment scripts
+Get-ChildItem quickstart*\azure-infra\azure-up.ps1, quickstart*\azure-infra\entra-setup.ps1 -ErrorAction SilentlyContinue |
+    Select-String -Pattern "AZURE_RESOURCE_TOKEN|yyyyMMddHHmm|AZURE_OWNER_ALIAS|user.name" | Out-Host
+```
+
+### MCP Registry Validation
+
+```powershell
+# Ensure Azure quickstart MCP entries are managed in repo-root registry
+if (Test-Path .github/mcp.json) {
+    Get-Content .github/mcp.json -Raw | Select-String -Pattern 'azure-sql-mcp-qs[1-5]|"url"\s*:\s*"https://.*/mcp"' -AllMatches | Out-Host
+}
+```
+
+```powershell
+# Ensure no legacy azure-infra aspire-up/down scripts remain
+Get-ChildItem quickstart*\azure-infra\aspire-*.ps1 -ErrorAction SilentlyContinue | Out-Host
+```
+
 ### Cross-Reference Validation
 
 ```powershell
@@ -236,7 +295,7 @@ Review the list — every file should be legitimate source. If you see `bin/`, `
 - **Cause:** `obj/` and `bin/` cache absolute paths from before the rename
 - **Fix:** Delete `obj/` and `bin/`, rebuild
 
-### `azd up` can't find Bicep
+### `azure-up.ps1` can't find Bicep
 - **Cause:** `azure.yaml` still points to old `infra.path`
 - **Fix:** Update `path` and `run` fields in `azure.yaml`
 
@@ -255,6 +314,18 @@ Review the list — every file should be legitimate source. If you see `bin/`, `
 ### Web app shows stale content
 - **Cause:** `config.js` wasn't regenerated after Azure deployment changes
 - **Fix:** Re-run post-provision or manually update `config.js`
+
+### Missing required owner tag
+- **Cause:** `AZURE_OWNER_ALIAS` not set or `owner` not included in `main.bicep` tags
+- **Fix:** set `AZURE_OWNER_ALIAS` in `azure-up` flow and include `owner: ownerAlias` in `tags`
+
+### MCP servers overwritten or missing
+- **Cause:** `azure-up` rewrote `.github/mcp.json` incorrectly or `azure-down` removed unrelated entries
+- **Fix:** always upsert/remove only the quickstart key (`azure-sql-mcp-qsN`) and preserve all other `servers` entries
+
+### Legacy script names referenced
+- **Cause:** README/scripts still reference `aspire-up.ps1`/`aspire-down.ps1`
+- **Fix:** standardize on `azure-up.ps1` and `azure-down.ps1` for all Azure quickstart operations
 
 ---
 

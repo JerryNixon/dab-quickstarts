@@ -69,8 +69,7 @@ Locally, DAB uses SQL Auth to talk to the containerized SQL Server — same as Q
 ## Deploy to Azure
 
 ```bash
-azd auth login
-azd up
+pwsh ./azure-infra/azure-up.ps1
 ```
 
 The post-provision script automatically:
@@ -79,6 +78,12 @@ The post-provision script automatically:
 3. Grants `db_datareader` and `db_datawriter` roles
 
 No passwords stored for DAB → Azure SQL.
+
+To tear down resources:
+
+```bash
+pwsh ./azure-infra/azure-down.ps1
+```
 
 ## What Changed from Quickstart 1
 

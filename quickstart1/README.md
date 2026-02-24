@@ -8,7 +8,7 @@ This is the most basic configuration. It demonstrates the request flow and how D
 
 - Set up DAB with anonymous access
 - Use .NET Aspire to orchestrate SQL Server + DAB locally
-- Deploy to Azure with `azd up`
+- Deploy to Azure with `azure-infra/azure-up.ps1`
 
 ## Auth Matrix
 
@@ -75,11 +75,16 @@ Aspire dashboard opens at `http://localhost:15888`. The web app is at `http://lo
 ## Deploy to Azure
 
 ```bash
-azd auth login
-azd up
+pwsh ./azure-infra/azure-up.ps1
 ```
 
 This provisions Azure SQL and Container Apps (DAB, SQL Commander, and web).
+
+To tear down resources:
+
+```bash
+pwsh ./azure-infra/azure-down.ps1
+```
 
 ## Database Schema
 

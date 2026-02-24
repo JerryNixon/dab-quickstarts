@@ -176,6 +176,39 @@ Write-Host "MCP Inspector updated" -ForegroundColor Green
 $configContent | Out-File -FilePath "web-app/config.js" -Encoding utf8 -Force
 Write-Host "Local config.js updated" -ForegroundColor Green
 
+# ── 12. Upsert repo-root .github/mcp.json entry for quickstart4 ──
+
+$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "../..")).Path
+$mcpDir = Join-Path $repoRoot ".github"
+$mcpFile = Join-Path $mcpDir "mcp.json"
+$mcpServerName = "azure-sql-mcp-qs4"
+$mcpUrl = "https://$dabFqdn/mcp"
+
+if (-not (Test-Path $mcpDir)) {
+    New-Item -ItemType Directory -Path $mcpDir -Force | Out-Null
+}
+
+$mcpConfig = @{}
+if (Test-Path $mcpFile) {
+    $mcpConfig = Get-Content $mcpFile -Raw | ConvertFrom-Json -AsHashtable
+}
+
+if (-not $mcpConfig) {
+    $mcpConfig = @{}
+}
+
+if (-not $mcpConfig.ContainsKey('servers') -or -not $mcpConfig.servers) {
+    $mcpConfig.servers = @{}
+}
+
+$mcpConfig.servers[$mcpServerName] = @{
+    url = $mcpUrl
+    type = 'http'
+}
+
+$mcpConfig | ConvertTo-Json -Depth 100 | Out-File -FilePath $mcpFile -Encoding utf8 -Force
+Write-Host "Updated .github/mcp.json with server '$mcpServerName'" -ForegroundColor Green
+
 # ── Summary ──
 
 # Append Azure URLs and connection string to .azure-env

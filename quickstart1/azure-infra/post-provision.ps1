@@ -124,6 +124,41 @@ Write-Host "Inspector updated" -ForegroundColor Green
 $configContent | Out-File -FilePath "web-app/config.js" -Encoding utf8 -Force
 Write-Host "Local config.js updated" -ForegroundColor Green
 
+# ── 10. Upsert workspace MCP server entry (.github/mcp.json) ──
+
+$repoRoot = (Resolve-Path (Join-Path (Get-Location) "..")).Path
+$mcpDir = Join-Path $repoRoot ".github"
+$mcpFile = Join-Path $mcpDir "mcp.json"
+$mcpServerName = "azure-sql-mcp-qs1"
+$mcpUrl = "$apiUrlAzure/mcp"
+
+if (-not (Test-Path $mcpDir)) {
+    New-Item -ItemType Directory -Path $mcpDir -Force | Out-Null
+}
+
+if (Test-Path $mcpFile) {
+    $mcpConfig = Get-Content -Path $mcpFile -Raw | ConvertFrom-Json -AsHashtable
+}
+else {
+    $mcpConfig = @{}
+}
+
+if ($null -eq $mcpConfig) {
+    $mcpConfig = @{}
+}
+
+if (-not $mcpConfig.ContainsKey('servers') -or $null -eq $mcpConfig.servers) {
+    $mcpConfig.servers = @{}
+}
+
+$mcpConfig.servers[$mcpServerName] = @{
+    type = 'http'
+    url = $mcpUrl
+}
+
+$mcpConfig | ConvertTo-Json -Depth 100 | Out-File -FilePath $mcpFile -Encoding utf8 -Force
+Write-Host "MCP server '$mcpServerName' configured at $mcpUrl" -ForegroundColor Green
+
 # ── Summary ──
 
 Write-Host "`n=== Deployment Complete ===" -ForegroundColor Cyan

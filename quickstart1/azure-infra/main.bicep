@@ -14,7 +14,13 @@ param sqlAdminPassword string
 
 param sqlAdminUser string = 'sqladmin'
 
-var tags = { 'azd-env-name': environmentName }
+@description('Owner alias used for required owner tag')
+param ownerAlias string
+
+var tags = {
+  'azd-env-name': environmentName
+  owner: ownerAlias
+}
 
 @description('Token suffix for resource names')
 param resourceToken string = ''

@@ -9,21 +9,32 @@ $localRedirect = "http://localhost:5173"
 
 # ── 0. Token management ──
 
+$utcToken = (Get-Date).ToUniversalTime().ToString('yyyyMMddHHmm')
+
 if (Test-Path $azureEnvFile) {
     $envData = @{}
     Get-Content $azureEnvFile | Where-Object { $_ -match '=' -and $_ -notmatch '^#' } | ForEach-Object {
         $parts = $_ -split '=', 2
         $envData[$parts[0].Trim()] = $parts[1].Trim()
     }
-    $token = $envData['token']
-    Write-Host "Using existing token: $token" -ForegroundColor Gray
+    $existingToken = $envData['token']
+    if ($existingToken -match '^\d{12}$') {
+        $token = $existingToken
+        Write-Host "Using existing token: $token" -ForegroundColor Gray
+    } else {
+        $token = $utcToken
+        Write-Host "Existing token missing/invalid; generated UTC token: $token" -ForegroundColor Yellow
+    }
 } else {
-    $token = (Get-Date).ToUniversalTime().ToString('yyyyMMddHHmm')
+    $token = $utcToken
     Write-Host "Generated token: $token" -ForegroundColor Green
 }
 
 if ($isAzd) {
     azd env set AZURE_RESOURCE_TOKEN $token
+    $signedInUser = az account show --query "user.name" -o tsv
+    $ownerAlias = if ($signedInUser -match '@') { ($signedInUser -split '@', 2)[0] } else { $signedInUser }
+    azd env set AZURE_OWNER_ALIAS $ownerAlias
 }
 
 $appName = "app-$token"

@@ -73,11 +73,16 @@ The web app auto-redirects to Microsoft login. Once signed in, all API calls inc
 ## Deploy to Azure
 
 ```bash
-azd auth login
-azd up
+pwsh ./azure-infra/azure-up.ps1
 ```
 
-The `preprovision` hook runs `entra-setup.ps1` automatically. After teardown, `azd down` runs `entra-teardown.ps1` to delete the app registration.
+The `preprovision` hook runs `entra-setup.ps1` automatically. During teardown via `azure-down.ps1`, the `postdown` hook runs `entra-teardown.ps1` to delete the app registration.
+
+To tear down resources:
+
+```bash
+pwsh ./azure-infra/azure-down.ps1
+```
 
 ## The Policy
 
