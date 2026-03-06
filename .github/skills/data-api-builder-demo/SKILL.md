@@ -289,7 +289,64 @@ Review the list — every file should be legitimate source. If you see `bin/`, `
 
 ---
 
+## Aspire Resource Dependencies
+
+Understanding when to use `.WaitFor()` vs `.WaitForCompletion()` is critical for avoiding race conditions.
+
+### WaitFor vs WaitForCompletion
+
+| Method | Waits For | Use Case |
+|--------|-----------|----------|
+| `.WaitFor(resource)` | Resource enters **Running** state (with health check if configured) | Long-lived services (DAB, SQL Server, web apps) |
+| `.WaitForCompletion(resource)` | Resource **runs to completion** (exits successfully) | Run-to-completion tasks (SQL project deployments, migrations, seed scripts) |
+
+### SQL Project Deployment Pattern
+
+**Problem:** DAB starts before the SQL schema is deployed, causing `Invalid object name 'dbo.TableName'` errors.
+
+**Root cause:** `.WaitFor(sqlDatabaseProject)` only waits for the SQL project container to enter Running state, not for the dacpac deployment to complete.
+
+**Correct pattern:**
+
+```csharp
+var sqlDatabaseProject = builder
+    .AddSqlProject<Projects.database>("sql-project")
+    .WithReference(sqlDatabase);
+
+// DAB and SQL Commander must wait for schema deployment to COMPLETE
+var apiServer = builder
+    .AddContainer("data-api", "azure-databases/data-api-builder", "1.7.83-rc")
+    // ... other config ...
+    .WaitForCompletion(sqlDatabaseProject);  // ✅ Wait for dacpac to finish
+
+var sqlCommander = builder
+    .AddContainer("sql-cmdr", "jerrynixon/sql-commander", "latest")
+    // ... other config ...
+    .WaitForCompletion(sqlDatabaseProject);  // ✅ Wait for dacpac to finish
+
+// Web app only needs DAB to be RUNNING (not exited)
+var webApp = builder
+    .AddContainer("web-app", "nginx", "alpine")
+    // ... other config ...
+    .WaitFor(apiServer);  // ✅ Wait for DAB to be running and healthy
+```
+
+**Key insight:**
+- **SQL projects** are run-to-completion resources — they deploy the dacpac and exit
+- **DAB, SQL Commander, web apps** are long-lived services that stay running
+- Using `.WaitForCompletion()` on a long-lived service would block indefinitely
+
+---
+
 ## Common Pitfalls
+
+### DAB fails with "Invalid object name"
+- **Cause:** Race condition — DAB starts before SQL project finishes deploying schema
+- **Fix:** Change `.WaitFor(sqlDatabaseProject)` → `.WaitForCompletion(sqlDatabaseProject)` for DAB and SQL Commander
+
+### Web app hangs on startup
+- **Cause:** Using `.WaitForCompletion(apiServer)` on a long-lived service (DAB never exits)
+- **Fix:** Change `.WaitForCompletion(apiServer)` → `.WaitFor(apiServer)` since web app only needs DAB running
 
 ### Folder rename breaks build
 - **Cause:** `obj/` and `bin/` cache absolute paths from before the rename
