@@ -10,6 +10,17 @@ Five progressive quickstarts that walk from anonymous access to full row-level e
 
 Each step tightens identity and shifts enforcement closer to the data.
 
+## Prerequisites
+
+- [.NET 10+ SDK](https://dotnet.microsoft.com/download)
+- [Aspire workload](https://learn.microsoft.com/dotnet/aspire/fundamentals/setup-tooling) — `dotnet workload install aspire`
+- [Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli) (required for Quickstarts 3+)
+- [Data API Builder CLI](https://learn.microsoft.com/azure/data-api-builder/) — `dotnet tool restore`
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- [PowerShell](https://learn.microsoft.com/powershell/scripting/install/installing-powershell) (required for Quickstarts 3+)
+
+> Quickstarts 1-2 only require .NET, Aspire, and Docker. Quickstarts 3+ add Azure CLI and PowerShell for Entra ID setup.
+
 ## Quickstart 1: SQL Authentication
 
 > Target repository: [github.com/Azure-Samples/data-api-builder-2.x-sql-quickstart-01-inbound-anonymous-outbound-sql-auth](https://github.com/Azure-Samples/data-api-builder-2.x-sql-quickstart-01-inbound-anonymous-outbound-sql-auth)

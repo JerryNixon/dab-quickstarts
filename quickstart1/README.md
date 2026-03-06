@@ -67,7 +67,7 @@ flowchart LR
 
 ```bash
 dotnet tool restore
-aspire run
+dotnet run --project aspire-apphost
 ```
 
 Aspire dashboard opens at `http://localhost:15888`. The web app is at `http://localhost:5173`.

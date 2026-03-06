@@ -61,7 +61,7 @@ flowchart LR
 
 ```bash
 dotnet tool restore
-aspire run
+dotnet run --project aspire-apphost
 ```
 
 Locally, DAB uses SQL Auth to talk to the containerized SQL Server — same as Quickstart 1.
