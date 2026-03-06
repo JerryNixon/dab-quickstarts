@@ -93,8 +93,12 @@ pwsh ./azure-infra/azure-down.ps1
 | `azure/main.bicep` | Outputs `AZURE_CONTAINER_APP_API_PRINCIPAL_ID` |
 | `azure/post-provision.ps1` | Adds Entra admin + SAMI user creation steps |
 
-## Next Steps
+## Related Quickstarts
 
-- [Quickstart 3](../quickstart3/) — Set up Entra ID auth infrastructure on the API
-- [Quickstart 4](../quickstart4/) — Add user login and per-user DAB policy filtering
-- [Quickstart 5](../quickstart5/) — Move enforcement into SQL with Row-Level Security
+| Quickstart | Inbound | Outbound | Security |
+|------------|---------|----------|----------|
+| [Quickstart 1](https://github.com/Azure-Samples/data-api-builder-2.x-sql-quickstart-01-inbound-anonymous-outbound-sql-auth) | Anonymous | SQL Auth | — |
+| **This repo** | Anonymous | Managed Identity | — |
+| [Quickstart 3](https://github.com/Azure-Samples/data-api-builder-2.x-sql-quickstart-03-inbound-entraid-outbound-managed-identity) | Entra ID | Managed Identity | — |
+| [Quickstart 4](https://github.com/Azure-Samples/data-api-builder-2.x-sql-quickstart-04-inbound-entraid-outbound-managed-identity-api-rls) | Entra ID | Managed Identity | API RLS |
+| [Quickstart 5](https://github.com/Azure-Samples/data-api-builder-2.x-sql-quickstart-05-inbound-entraid-outbound-managed-identity-db-rls) | Entra ID | Managed Identity | DB RLS |

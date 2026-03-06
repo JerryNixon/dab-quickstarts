@@ -768,6 +768,8 @@ Allows splitting configuration across multiple files for better organization. Us
     }
   }
 }
+
+> **⚠️ Aspire warning:** Do NOT use `"headers": "@env('OTEL_EXPORTER_OTLP_HEADERS')"` when running under Aspire. Aspire injects `OTEL_EXPORTER_OTLP_ENDPOINT` and `OTEL_SERVICE_NAME` automatically but does **not** inject `OTEL_EXPORTER_OTLP_HEADERS`. Since DAB requires all `@env()` references to resolve, an unset variable causes a **fatal deserialization crash loop**. Only include `headers` when targeting an authenticated OTLP collector (e.g., cloud APM), and ensure the env var exists.
 ```
 
 **Log Level (namespace-specific):**

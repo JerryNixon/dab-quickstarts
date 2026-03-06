@@ -2,15 +2,17 @@
 
 Five progressive quickstarts that walk from anonymous access to full row-level enforcement in Azure SQL. Each quickstart is self-contained and can run independently. The architecture evolves step by step, so you can see exactly what changes at each layer.
 
-* [Quickstart 1](#quickstart-1-sql-authentication): Anonymous + SQL credentials
-* [Quickstart 2](#quickstart-2-managed-identity): Anonymous + Managed Identity
-* [Quickstart 3](#quickstart-3-securing-the-api): Token-secured API + Managed Identity
-* [Quickstart 4](#quickstart-4-user-authentication-with-dab-policies): User authentication + DAB policy enforcement
-* [Quickstart 5](#quickstart-5-row-level-security): User authentication + SQL Row-Level Security enforcement
+* [Quickstart 1](#quickstart-1-sql-authentication): Inbound anonymous, outbound SQL auth
+* [Quickstart 2](#quickstart-2-managed-identity): Inbound anonymous, outbound managed identity
+* [Quickstart 3](#quickstart-3-securing-the-api): Inbound Entra ID, outbound managed identity
+* [Quickstart 4](#quickstart-4-user-authentication-with-dab-policies): Inbound Entra ID, outbound managed identity, API RLS
+* [Quickstart 5](#quickstart-5-row-level-security): Inbound Entra ID, outbound managed identity, DB RLS
 
 Each step tightens identity and shifts enforcement closer to the data.
 
 ## Quickstart 1: SQL Authentication
+
+> Target repository: [github.com/Azure-Samples/data-api-builder-2.x-sql-quickstart-01-inbound-anonymous-outbound-sql-auth](https://github.com/Azure-Samples/data-api-builder-2.x-sql-quickstart-01-inbound-anonymous-outbound-sql-auth)
 
 ```mermaid
 flowchart LR
@@ -48,6 +50,8 @@ This is the most basic configuration. It demonstrates the request flow and how D
 
 ## Quickstart 2: Managed Identity
 
+> Target repository: [github.com/Azure-Samples/data-api-builder-2.x-sql-quickstart-02-inbound-anonymous-outbound-managed-identity](https://github.com/Azure-Samples/data-api-builder-2.x-sql-quickstart-02-inbound-anonymous-outbound-managed-identity)
+
 ```mermaid
 flowchart LR
     U[User]
@@ -83,6 +87,8 @@ This eliminates stored database credentials and is the recommended baseline for 
 
 ## Quickstart 3: Setting Up Entra ID
 
+> Target repository: [github.com/Azure-Samples/data-api-builder-2.x-sql-quickstart-03-inbound-entraid-outbound-managed-identity](https://github.com/Azure-Samples/data-api-builder-2.x-sql-quickstart-03-inbound-entraid-outbound-managed-identity)
+
 ```mermaid
 flowchart LR
     U[User]
@@ -113,6 +119,8 @@ This sets the stage for Quickstart 4, which adds login, bearer tokens, and per-u
 > The app registration and EntraId provider are in place, but the anonymous role means no token is required. This pattern lets you prepare auth infrastructure before enabling it — a common staging approach.
 
 ## Quickstart 4: User Authentication with DAB Policies
+
+> Target repository: [github.com/Azure-Samples/data-api-builder-2.x-sql-quickstart-04-inbound-entraid-outbound-managed-identity-api-rls](https://github.com/Azure-Samples/data-api-builder-2.x-sql-quickstart-04-inbound-entraid-outbound-managed-identity-api-rls)
 
 ```mermaid
 flowchart LR
@@ -171,6 +179,8 @@ To restrict access to rows where the OwnerId matches the user’s subject claim.
 ```
 
 ## Quickstart 5: Row-Level Security
+
+> Target repository: [github.com/Azure-Samples/data-api-builder-2.x-sql-quickstart-05-inbound-entraid-outbound-managed-identity-db-rls](https://github.com/Azure-Samples/data-api-builder-2.x-sql-quickstart-05-inbound-entraid-outbound-managed-identity-db-rls)
 
 ```mermaid
 flowchart LR

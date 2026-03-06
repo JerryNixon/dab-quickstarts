@@ -82,6 +82,38 @@ The inspector UI will pre-select the configured server but **does not auto-conne
 
 ---
 
+## Direct (Non-Aspire) Usage
+
+When running against DAB directly (outside Aspire), prefer these launch patterns.
+
+### HTTP MCP endpoint (proxy mode)
+
+For HTTP MCP endpoints (for example, `http://localhost:5000/mcp`), launch Inspector in proxy mode by passing the endpoint URL directly:
+
+```bash
+npx -y @modelcontextprotocol/inspector http://localhost:5000/mcp
+```
+
+This routes requests through the Inspector proxy and helps avoid browser CORS and session-header issues such as missing `Mcp-Session-Id` in direct browser mode.
+
+### STDIO MCP endpoint (command mode)
+
+When testing DAB over stdio, launch Inspector in command mode so Inspector starts DAB as a child process:
+
+```bash
+npx -y @modelcontextprotocol/inspector --command "dab" --args "start --mcp-stdio"
+```
+
+To run with an explicit role:
+
+```bash
+npx -y @modelcontextprotocol/inspector --command "dab" --args "start --mcp-stdio role:<role-name>"
+```
+
+This keeps transport local to the process (no `/mcp` URL is required) and is the simplest way to validate stdio tool discovery and calls.
+
+---
+
 ## Inspector Architecture (Source-Level Reference)
 
 The Inspector has two processes and a well-defined configuration chain. Understanding these internals is essential for containerization, Azure deployment, and debugging.

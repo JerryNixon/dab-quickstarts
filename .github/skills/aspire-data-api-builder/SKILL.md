@@ -13,6 +13,7 @@ This skill provides a minimal workflow for running **SQL Server**, **Data API Bu
 
 - **One `apphost.cs` file** orchestrates everything — no project files, no Docker Compose
 - **`aspire run`** starts all services with health checks, dependencies, and telemetry
+- **Aspire injects OTEL env vars** (`OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_SERVICE_NAME`) automatically — do NOT add `"headers": "@env('OTEL_EXPORTER_OTLP_HEADERS')"` to `dab-config.json` telemetry config unless the env var is set, or DAB will crash loop
 - **Containers talk by service name**, not localhost
 - **DAB reads config from bind-mounted file** — mount `dab-config.json` read-only
 - **SQL Server must be healthy before DAB starts** — use `.WaitFor()` and health checks
@@ -254,6 +255,18 @@ docker logs <container-id>
 ```env
 MSSQL_CONNECTION_STRING=Server=sql-server;Database=MyDb;...
 ```
+
+### DAB crash loop with `@env()` telemetry headers
+
+Aspire automatically injects `OTEL_EXPORTER_OTLP_ENDPOINT` and `OTEL_SERVICE_NAME` into containers, but **not** `OTEL_EXPORTER_OTLP_HEADERS`. If your `dab-config.json` includes:
+
+```json
+"headers": "@env('OTEL_EXPORTER_OTLP_HEADERS')"
+```
+
+DAB will enter a **fatal deserialization crash loop** because all `@env()` references must resolve to a value. The `headers` field is only needed when the OTLP endpoint requires authentication (e.g., cloud APM services) — local Aspire doesn't.
+
+**Fix:** Remove the `headers` field from `dab-config.json` telemetry config when running with Aspire locally. Only add it when targeting an authenticated OTLP collector, and ensure the referenced environment variable is set.
 
 ### Port conflicts
 
