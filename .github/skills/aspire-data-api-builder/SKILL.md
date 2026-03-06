@@ -16,7 +16,7 @@ This skill provides a minimal workflow for running **SQL Server**, **Data API Bu
 - **Aspire injects OTEL env vars** (`OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_SERVICE_NAME`) automatically — do NOT add `"headers": "@env('OTEL_EXPORTER_OTLP_HEADERS')"` to `dab-config.json` telemetry config unless the env var is set, or DAB will crash loop
 - **Containers talk by service name**, not localhost
 - **DAB reads config from bind-mounted file** — mount `dab-config.json` read-only
-- **SQL Server must be healthy before DAB starts** — use `.WaitFor()` and health checks
+- **SQL Server must be healthy before DAB starts** — use `.WaitFor()` for the database, `.WaitForCompletion()` for SQL projects
 - **Aspire Dashboard** provides visual monitoring, logs, and metrics at `http://localhost:15888`
 
 ---
@@ -217,18 +217,22 @@ docker stop $(docker ps -q)
 
 ## Adding Database Schema (Optional)
 
-To deploy a SQL schema on startup, add this before `var dabServer`:
+To deploy a SQL schema on startup using a SQL Database Project, add this before `var dabServer`:
 
 ```csharp
-var sqlDatabaseWithSchema = sqlDatabase
-    .WithSqlProject(new FileInfo("database.sql").FullName);
+var sqlDatabaseProject = builder
+    .AddSqlProject<Projects.database>("sql-project")
+    .WithReference(sqlDatabase);
 ```
 
-Then change `dabServer` to wait for `sqlDatabaseWithSchema` instead of `sqlDatabase`:
+Then change `dabServer` and `sqlCommander` to wait for the SQL project to **complete deployment** (not just start):
 
 ```csharp
-.WaitFor(sqlDatabaseWithSchema);
+// Use WaitForCompletion — SQL projects are run-to-completion resources
+.WaitForCompletion(sqlDatabaseProject);
 ```
+
+> **Critical:** Use `.WaitForCompletion()` for SQL projects, not `.WaitFor()`. The SQL project container exits after deploying the dacpac — `.WaitFor()` only waits for it to enter Running state, which may be before deployment finishes. This causes DAB to fail with "Invalid object name" errors.
 
 ---
 
@@ -254,6 +258,20 @@ docker logs <container-id>
 **Verify connection string** in `.env` uses service name `sql-server`, not `localhost`:
 ```env
 MSSQL_CONNECTION_STRING=Server=sql-server;Database=MyDb;...
+```
+
+### DAB fails with "Invalid object name 'dbo.TableName'"
+
+**Cause:** Race condition — DAB started before the SQL project finished deploying the schema. Using `.WaitFor(sqlDatabaseProject)` only waits for Running state, not completion.
+
+**Fix:** Change `.WaitFor(sqlDatabaseProject)` to `.WaitForCompletion(sqlDatabaseProject)`. SQL projects are run-to-completion resources that exit after dacpac deployment.
+
+```csharp
+// WRONG — may start before dacpac finishes
+.WaitFor(sqlDatabaseProject)
+
+// CORRECT — waits for deployment to complete
+.WaitForCompletion(sqlDatabaseProject)
 ```
 
 ### DAB crash loop with `@env()` telemetry headers

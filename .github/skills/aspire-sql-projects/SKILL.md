@@ -205,24 +205,49 @@ builder.AddSqlProject<Projects.database>("sql-project")
 
 ---
 
-## WaitFor Dependencies
+## WaitFor vs WaitForCompletion
 
-Services that need the schema (DAB, SQL Commander) must wait for the **SQL project**, not the raw database:
+SQL Database Projects are **run-to-completion** resources — they deploy the dacpac and exit. Long-lived services like DAB and SQL Commander need the schema to be **fully deployed** before starting.
+
+| Method | Waits For | Use Case |
+|--------|-----------|----------|
+| `.WaitFor(resource)` | Resource enters **Running** state (with health check if configured) | Long-lived services (DAB, web apps) |
+| `.WaitForCompletion(resource)` | Resource **runs to completion** (exits successfully) | Run-to-completion tasks (SQL projects, migrations) |
+
+### Critical Pattern for SQL Projects
 
 ```csharp
-// CORRECT — waits for schema deployment to complete
+// CORRECT — waits for dacpac deployment to COMPLETE (resource exits)
 var apiServer = builder.AddContainer(...)
-    .WaitFor(sqlDatabaseProject);
+    .WaitForCompletion(sqlDatabaseProject);  // ✅ Schema fully deployed
 
 var sqlCommander = builder.AddContainer(...)
-    .WaitFor(sqlDatabaseProject);
+    .WaitForCompletion(sqlDatabaseProject);  // ✅ Schema fully deployed
 
-// WRONG — database exists but schema hasn't been deployed yet
+// WRONG — WaitFor only waits for Running state, not completion
+var apiServer = builder.AddContainer(...)
+    .WaitFor(sqlDatabaseProject);  // ❌ May start before dacpac finishes
+
+// ALSO WRONG — waiting on database, not the project
 var apiServer = builder.AddContainer(...)
     .WaitFor(sqlDatabase);  // ❌ DAB will fail: table not found
 ```
 
-The SQL project resource transitions to "Running" only after SqlPackage finishes deploying the dacpac. Downstream services that `.WaitFor(sqlDatabaseProject)` will not start until the schema is fully deployed.
+### Web App Dependencies
+
+Web apps (static frontends) only need DAB to be **running and healthy**, not exited:
+
+```csharp
+// CORRECT — web app waits for DAB to be running
+var webApp = builder.AddContainer("web-app", "nginx", "alpine")
+    .WaitFor(apiServer);  // ✅ DAB is running and healthy
+
+// WRONG — WaitForCompletion on a long-lived service blocks forever
+var webApp = builder.AddContainer(...)
+    .WaitForCompletion(apiServer);  // ❌ DAB never exits, hangs indefinitely
+```
+
+**Key insight:** SQL projects **exit after deployment** (run-to-completion), while DAB/SQL Commander/web apps **stay running** (long-lived services). Match the wait method to the resource type.
 
 ---
 
@@ -319,14 +344,14 @@ var apiServer = builder
     .WithImageRegistry("mcr.microsoft.com")
     .WithHttpEndpoint(targetPort: 5000, port: 5000, name: "http")
     .WithEnvironment("MSSQL_CONNECTION_STRING", sqlDatabase)
-    .WaitFor(sqlDatabaseProject);   // wait for schema, not just database
+    .WaitForCompletion(sqlDatabaseProject);   // wait for dacpac to finish deploying
 
 var sqlCommander = builder
     .AddContainer("sql-cmdr", "jerrynixon/sql-commander", "latest")
     .WithImageRegistry("docker.io")
     .WithHttpEndpoint(targetPort: 8080, name: "http")
     .WithEnvironment("ConnectionStrings__db", sqlDatabase)
-    .WaitFor(sqlDatabaseProject);   // wait for schema, not just database
+    .WaitForCompletion(sqlDatabaseProject);   // wait for dacpac to finish deploying
 
 await builder.Build().RunAsync();
 ```
@@ -366,8 +391,9 @@ Aspire handles all of this automatically via `AddSqlProject`.
 
 ### DAB fails with "Invalid object name 'dbo.Todos'"
 
-**Cause:** DAB started before the schema was deployed — it's waiting on `sqlDatabase` instead of `sqlDatabaseProject`.  
-**Fix:** Change `.WaitFor(sqlDatabase)` to `.WaitFor(sqlDatabaseProject)` on the DAB container.
+**Cause:** DAB started before the schema was fully deployed. Either waiting on `sqlDatabase` instead of `sqlDatabaseProject`, or using `.WaitFor()` instead of `.WaitForCompletion()`.
+
+**Fix:** Change to `.WaitForCompletion(sqlDatabaseProject)` on the DAB container. The `.WaitForCompletion()` method waits for the SQL project to **exit after deployment**, not just enter Running state.
 
 ### "The database 'TodoDb' does not exist"
 
