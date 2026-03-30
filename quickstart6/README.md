@@ -36,7 +36,7 @@ flowchart LR
 
 ## Prerequisites
 
-- [.NET 10+ SDK](https://dotnet.microsoft.com/download)
+- [.NET 8 or later](https://dotnet.microsoft.com/download)
 - [Aspire workload](https://learn.microsoft.com/dotnet/aspire/fundamentals/setup-tooling) — `dotnet workload install aspire`
 - [Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli) (for Entra ID setup)
 - [Data API Builder CLI](https://learn.microsoft.com/azure/data-api-builder/) — `dotnet tool restore`
