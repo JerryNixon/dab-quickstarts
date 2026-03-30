@@ -12,7 +12,7 @@ Each step tightens identity and shifts enforcement closer to the data.
 
 ## Prerequisites
 
-- [.NET 10+ SDK](https://dotnet.microsoft.com/download)
+- [.NET 8 or later](https://dotnet.microsoft.com/download)
 - [Aspire workload](https://learn.microsoft.com/dotnet/aspire/fundamentals/setup-tooling) — `dotnet workload install aspire`
 - [Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli) (required for Quickstarts 3+)
 - [Data API Builder CLI](https://learn.microsoft.com/azure/data-api-builder/) — `dotnet tool restore`
@@ -23,7 +23,7 @@ Each step tightens identity and shifts enforcement closer to the data.
 
 ## Quickstart 1: SQL Authentication
 
-> Target repository: [github.com/Azure-Samples/data-api-builder-2.x-sql-quickstart-01-inbound-anonymous-outbound-sql-auth](https://github.com/Azure-Samples/data-api-builder-2.x-sql-quickstart-01-inbound-anonymous-outbound-sql-auth)
+> Target repository: [github.com/Azure-Samples/dab-2.0-quickstart-web_anon-api_anon-db_sql_auth](https://github.com/Azure-Samples/dab-2.0-quickstart-web_anon-api_anon-db_sql_auth)
 
 ```mermaid
 flowchart LR
@@ -61,7 +61,7 @@ This is the most basic configuration. It demonstrates the request flow and how D
 
 ## Quickstart 2: Managed Identity
 
-> Target repository: [github.com/Azure-Samples/data-api-builder-2.x-sql-quickstart-02-inbound-anonymous-outbound-managed-identity](https://github.com/Azure-Samples/data-api-builder-2.x-sql-quickstart-02-inbound-anonymous-outbound-managed-identity)
+> Target repository: [github.com/Azure-Samples/dab-2.0-quickstart-web_anon-api_anon-db_entra](https://github.com/Azure-Samples/dab-2.0-quickstart-web_anon-api_anon-db_entra)
 
 ```mermaid
 flowchart LR
@@ -98,7 +98,7 @@ This eliminates stored database credentials and is the recommended baseline for 
 
 ## Quickstart 3: Setting Up Entra ID
 
-> Target repository: [github.com/Azure-Samples/data-api-builder-2.x-sql-quickstart-03-inbound-entraid-outbound-managed-identity](https://github.com/Azure-Samples/data-api-builder-2.x-sql-quickstart-03-inbound-entraid-outbound-managed-identity)
+> Target repository: [github.com/Azure-Samples/dab-2.0-quickstart-web_anon-api_entra-db_entra](https://github.com/Azure-Samples/dab-2.0-quickstart-web_anon-api_entra-db_entra)
 
 ```mermaid
 flowchart LR
@@ -131,7 +131,7 @@ This sets the stage for Quickstart 4, which adds login, bearer tokens, and per-u
 
 ## Quickstart 4: User Authentication with DAB Policies
 
-> Target repository: [github.com/Azure-Samples/data-api-builder-2.x-sql-quickstart-04-inbound-entraid-outbound-managed-identity-api-rls](https://github.com/Azure-Samples/data-api-builder-2.x-sql-quickstart-04-inbound-entraid-outbound-managed-identity-api-rls)
+> Target repository: [github.com/Azure-Samples/dab-2.0-quickstart-web_entra-api_entra-db_entra-api_rls](https://github.com/Azure-Samples/dab-2.0-quickstart-web_entra-api_entra-db_entra-api_rls)
 
 ```mermaid
 flowchart LR
@@ -191,7 +191,7 @@ To restrict access to rows where the OwnerId matches the user’s subject claim.
 
 ## Quickstart 5: Row-Level Security
 
-> Target repository: [github.com/Azure-Samples/data-api-builder-2.x-sql-quickstart-05-inbound-entraid-outbound-managed-identity-db-rls](https://github.com/Azure-Samples/data-api-builder-2.x-sql-quickstart-05-inbound-entraid-outbound-managed-identity-db-rls)
+> Target repository: [github.com/Azure-Samples/dab-2.0-quickstart-web_entra-api_entra-db_entra-db_rls](https://github.com/Azure-Samples/dab-2.0-quickstart-web_entra-api_entra-db_entra-db_rls)
 
 ```mermaid
 flowchart LR
