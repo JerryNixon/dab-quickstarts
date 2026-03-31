@@ -136,6 +136,7 @@ az containerapp update `
     --name $dabAppName `
     --resource-group $resourceGroup `
     --image "$acrName.azurecr.io/dab-api:latest" `
+    --revision-suffix "r$token" `
     --set-env-vars "DAB_OBO_CLIENT_ID=$clientId" "DAB_OBO_TENANT_ID=$tenantId" "DAB_OBO_CLIENT_SECRET=secretref:obo-secret" | Out-Null
 Write-Host "DAB updated with OBO" -ForegroundColor Green
 
@@ -189,7 +190,8 @@ Write-Host "Updating web container app..." -ForegroundColor Yellow
 az containerapp update `
     --name $webAppName `
     --resource-group $resourceGroup `
-    --image "$acrName.azurecr.io/web-app:latest" | Out-Null
+    --image "$acrName.azurecr.io/web-app:latest" `
+    --revision-suffix "r$token" | Out-Null
 Write-Host "Web updated" -ForegroundColor Green
 
 # ── 12. Build and push MCP Inspector image to ACR ──
