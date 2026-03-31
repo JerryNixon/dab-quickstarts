@@ -9,6 +9,7 @@ body {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
     padding: 1.5rem;
+    padding-bottom: 220px; /* clear the fixed debug log */
 }
 
 .container {
@@ -128,7 +129,7 @@ header {
     border-radius: 10px;
     box-shadow: 0 10px 40px rgba(0,0,0,0.2);
     overflow: hidden;
-    min-height: 120px;
+    min-height: 212px;
 }
 
 .task-item {
