@@ -9,6 +9,14 @@ This skill covers deploying **Data API Builder (DAB)** to **Azure Container Apps
 
 For local development, see the `aspire-data-api-builder` or `docker-data-api-builder` skill.
 
+## Included script templates
+
+This skill now includes reusable script templates (adapted from `quickstart1`) under `./scripts/`:
+
+- [azure-up.ps1](./scripts/azure-up.ps1) — login + `azd up` with token/owner env setup
+- [azure-down.ps1](./scripts/azure-down.ps1) — `azd down` + scoped MCP registry cleanup
+- [post-provision-template.ps1](./scripts/post-provision-template.ps1) — schema publish + custom image build/update pattern
+
 ---
 
 ## Core Mental Model
@@ -64,11 +72,11 @@ azd up
 ```
 project/
   ├── azure.yaml              # azd entry point
-  ├── azure/
+  ├── azure-infra/
   │   ├── main.bicep           # Subscription-scoped entry
   │   ├── resources.bicep      # All Azure resources
   │   └── post-provision.ps1   # Content deployment hook
-  ├── api/
+  ├── data-api/
   │   ├── dab-config.json      # DAB configuration
   │   └── Dockerfile           # Custom DAB image
   └── database/

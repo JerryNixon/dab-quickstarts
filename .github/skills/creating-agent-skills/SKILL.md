@@ -1,697 +1,137 @@
 ---
 name: creating-agent-skills
-description: Guide for creating and auditing GitHub Copilot Agent Skills. Use this when asked to create new skills, understand skill structure, or improve existing skills.
+description: Create and audit GitHub Copilot Agent Skills with clear discovery descriptions, correct SKILL.md frontmatter, and reusable multi-step workflows.
 license: MIT
 ---
 
 # Creating GitHub Copilot Agent Skills
 
-This skill teaches agents how to create well-structured, effective Agent Skills for GitHub Copilot. Agent Skills are folders of instructions, scripts, and resources that Copilot loads when relevant to improve performance in specialized tasks.
+Create skills that are **discoverable**, **actionable**, and **compact**. Prefer short instructions with explicit decision points over long reference dumps.
 
----
+## When to use a skill
 
-## When to Create a Skill
+Use a skill when the task is repeatable and multi-step.
 
-### Create a Skill When:
-- Task requires **detailed, repeatable instructions** for a specific workflow
-- Process has multiple steps that need consistent execution
-- Instructions are **contextually loaded** (not needed for every task)
-- You're documenting complex tool usage (CLI, API, framework)
-- Multiple users/projects would benefit from standardized guidance
+Use another primitive when:
+- **Instructions**: guidance should apply to most tasks in a repo
+- **Prompt**: one focused operation with clear inputs
+- **Custom agent**: requires stage isolation or different tool permissions by phase
 
-### Use Custom Instructions Instead When:
-- Instructions apply to **almost every task** in the repository
-- Guidance is about coding standards, style preferences, or conventions
-- Instructions are simple and brief (1-2 sentences)
+## Authoring workflow
 
-**Rule of Thumb:** Custom instructions are like `.editorconfig`, skills are like documentation.
+1. **Extract the workflow**
+   - Capture steps, branching decisions, and completion checks from context.
+2. **Clarify only gaps**
+   - Ask for: outcome, scope (workspace/personal), and depth (checklist/full workflow).
+3. **Draft `SKILL.md`**
+   - Add frontmatter first, then concise procedural content.
+4. **Harden discovery**
+   - Improve `description` with trigger phrases users actually say.
+5. **Finalize**
+   - Add test prompts and related follow-on customizations.
 
----
+## Location and structure
 
-## Skill Structure Requirements
-
-### Directory Structure
-
-**Project Skills** (repository-specific):
+Project scope:
 ```
 .github/skills/<skill-name>/
-├── SKILL.md          (required)
-├── scripts/          (optional)
-├── examples/         (optional)
-└── resources/        (optional)
+├── SKILL.md
+├── scripts/        # optional
+├── references/     # optional
+└── assets/         # optional
 ```
 
-**Alternative:** `.claude/skills/<skill-name>/` is also supported for compatibility.
-
-**Personal Skills** (user-wide):
+Personal scope:
 ```
 ~/.copilot/skills/<skill-name>/
-├── SKILL.md
-└── ...
+└── SKILL.md
 ```
 
-**Alternative:** `~/.claude/skills/<skill-name>/` is also supported.
+Rules:
+- Folder and `name` must match.
+- Use lowercase + hyphens for skill names.
+- File name must be exactly `SKILL.md`.
 
-### Naming Rules
-
-**Directory name:**
-- Lowercase only
-- Use hyphens for spaces
-- Match the `name` in frontmatter
-- Examples: `github-actions-debugging`, `api-testing`, `database-migrations`
-
-**File name:**
-- MUST be `SKILL.md` (case-sensitive, all caps)
-- No other name will be recognized
-
----
-
-## SKILL.md File Format
-
-### Required YAML Frontmatter
-
-Every `SKILL.md` MUST start with YAML frontmatter containing:
+## Required SKILL.md frontmatter
 
 ```yaml
 ---
-name: skill-name-here
-description: Brief description of what this skill does and when to use it.
+name: skill-name
+description: 'What this skill does and when to use it.'
+argument-hint: 'Optional hint for slash invocation'
+user-invocable: true
+disable-model-invocation: false
 ---
 ```
 
-**Frontmatter Requirements:**
+Validation:
+- `name`: 1-64 chars, lowercase alphanumeric and hyphens
+- `description`: concrete outcome + trigger phrases
+- Quote `description` when punctuation (for example `:`) may break YAML
+- Frontmatter must be the first content in the file
 
-| Field | Required | Format | Purpose |
-|-------|----------|--------|---------|
-| `name` | **Yes** | Lowercase with hyphens | Unique identifier matching directory name |
-| `description` | **Yes** | Plain text (50-150 chars) | Tells Copilot when to use this skill |
-| `license` | No | Text or SPDX identifier | License terms for the skill |
+## Description quality standard
 
-**Critical:** The frontmatter MUST be the very first thing in the file. No blank lines before the opening `---`.
+Good descriptions:
+- Start with outcome/action (`Create`, `Enable`, `Debug`, `Deploy`)
+- Include plain-language trigger phrases users type
+- Mention concrete artifacts when relevant (`dab-config.json`, `.vscode/mcp.json`)
 
-### Prelude Requirement
+Avoid:
+- “Guide for …” filler
+- “Use when working with …” vagueness
+- Tool-only jargon without plain-language synonyms
 
-The skill content should immediately follow the frontmatter and start with a clear statement of purpose. This "prelude" helps both humans and AI understand the skill's scope.
-
-**Pattern:**
-```markdown
----
-name: your-skill
-description: One-line description
----
-
-# Skill Title
-
-Brief introduction explaining what this skill does, what it helps with, and its primary use cases.
-
----
-
-[Rest of skill content]
-```
-
----
-
-## Writing Effective Skill Descriptions
-
-The `description` field determines **when Copilot loads your skill**. Make it specific and action-oriented.
-
-### Good Descriptions ✅
-
-```yaml
-description: Data API Builder CLI commands for init, add, update, export, and start. Use when asked to create a dab-config, add entities, configure REST/GraphQL endpoints, or run DAB locally via CLI.
-# Specific actions (init, add, update) + user trigger phrases (create, configure, run)
-```
-```yaml
-description: Enable MCP endpoints in Data API Builder so AI agents (Copilot, Claude, etc.) can query SQL databases. Use when asked to set up MCP, create .vscode/mcp.json, or give an agent database access.
-# Names the outcome (AI agents query databases) + concrete artifacts (.vscode/mcp.json)
-```
-```yaml
-description: Add SQL Commander to a .NET Aspire AppHost for browsing and querying SQL Server. Use when asked to add a SQL query tool, browse database tables, or configure SQL Commander in Aspire.
-# Starts with an action verb (Add) + includes what a user would say ("add a SQL query tool")
-```
-
-### Bad Descriptions ❌
-
-```yaml
-description: Guide for using Data API Builder CLI. Use when working with DAB configurations, entities, or database API generation.
-# "Guide for using" is filler — what actions? "working with" is passive — what operations?
-```
-```yaml
-description: Guide for Data API Builder configuration files. Use when working with dab-config.json structure, validation, or configuration best practices.
-# "Guide for" + "working with" — too passive. Doesn't trigger on "create", "edit", or "validate".
-```
-```yaml
-description: Guide for SQL MCP Server (Data API Builder MCP). Use when configuring databases for AI agent access via Model Context Protocol.
-# Jargon-heavy ("Model Context Protocol"). Misses what users actually say: "MCP endpoint", "Copilot database access".
-```
-```yaml
-description: Helper for things
-# Not actionable - what things?
-```
-
-### Description Anti-Patterns
-
-| Pattern | Problem | Fix |
-|---------|---------|-----|
-| "Guide for X" | Filler — every skill is a guide | Start with an action verb or the outcome |
-| "Use when working with X" | Passive — doesn't match user intent | "Use when asked to create/add/configure X" |
-| Jargon without context | "MCP" alone won't trigger for most users | Expand: "MCP (Model Context Protocol)" + plain-language synonyms |
-| Listing only tool names | Doesn't capture what users actually say | Include user-facing phrases: "add a SQL query tool", "give an agent database access" |
-| One generic trigger | Only fires on exact term | Add 2-3 alternate phrasings users might say |
-
-### Description Best Practices
-
-1. **Start with the outcome**: "Enable MCP endpoints..." not "Guide for MCP endpoints..."
-2. **Use action verbs**: create, add, enable, configure, deploy, debug — not "working with"
-3. **Include user trigger phrases**: What would a user *actually say*? "add a SQL query tool", "set up MCP", "create a database project"
-4. **Name concrete artifacts**: `.vscode/mcp.json`, `dab-config.json`, `docker-compose.yml`, `.sqlproj`
-5. **Expand jargon once**: "MCP (Model Context Protocol)", "DAB (Data API Builder)", "dacpac"
-6. **Add 2-3 alternate phrasings**: Users say things differently — "deploy a dacpac" vs "schema deployment" vs "replace WithCreationScript"
-7. **Keep it concise**: 100-200 characters ideal (enough for specificity, short enough to scan)
-8. **Avoid filler prefixes**: Drop "Guide for", "Instructions for", "This skill contains"
-
----
-
-## Skill Content Structure
-
-### Recommended Sections
+## Minimal body template
 
 ```markdown
-# Skill Title
+# <Skill Title>
 
-Brief introduction (2-3 sentences)
+One short paragraph: what this skill produces.
 
----
+## When to Use
+- Trigger phrase 1
+- Trigger phrase 2
 
-## Core Concepts / Mental Model
+## Procedure
+1. Step one
+2. Step two
+3. Step three
 
-Foundational understanding needed to use the skill effectively
+## Decision Points
+- If A, do X
+- If B, do Y
 
-## Common Workflows / Decision Trees
+## Completion Checks
+- Check 1
+- Check 2
 
-Step-by-step processes for typical tasks
+## References
+- Optional local references when needed
+```
 
-## Command Reference / API Guide
+## Progressive loading guidance
 
-Detailed reference for tools, commands, or APIs
+- Keep `SKILL.md` focused (prefer concise files over encyclopedic docs).
+- Move deep content to `references/` and link with relative paths.
+- The `description` is the discovery surface; optimize it first.
 
-## Examples / Templates
+## Completion checklist
 
-Concrete examples users can adapt
+A skill is ready when all are true:
+- Workflow is executable end-to-end by a newcomer.
+- Branching logic is explicit.
+- Completion checks are objective.
+- At least 3 test prompts reliably trigger the skill.
+- No secrets, credentials, or sensitive data are embedded.
 
-## Troubleshooting / FAQ
+## Example test prompts
 
-Common problems and solutions
+- "Create a new skill for reviewing PRs with a checklist."
+- "Refine this SKILL.md description so discovery works better."
+- "Audit this skill for missing decision points and completion checks."
 
 ## References
 
-Links to official documentation
-```
-
-### Writing Style Guidelines
-
-**Do:**
-- Use clear, imperative language ("Run this command", "Check for...")
-- Provide code examples in fenced code blocks with language hints
-- Structure with headings, lists, and tables for scannability
-- Include both "happy path" and edge cases
-- Offer decision trees for complex scenarios ("If X, then do Y")
-- Use consistent terminology throughout
-
-**Don't:**
-- Write long paragraphs - prefer bullet points
-- Assume prior knowledge - explain acronyms on first use
-- Duplicate official docs - link to them and add value
-- Use "you might want to" - be directive ("Do X to achieve Y")
-- Mix different tools or concepts - keep skills focused
-
----
-
-## Code Examples Best Practices
-
-### Format Code Blocks
-
-Always specify the language for syntax highlighting:
-
-````markdown
-```bash
-git --no-pager log --oneline -n 10
-```
-
-```yaml
-name: my-skill
-description: Example skill
-```
-
-```json
-{
-  "entities": {
-    "Product": {
-      "source": "dbo.Products"
-    }
-  }
-}
-```
-````
-
-### Provide Context
-
-Don't just show code - explain when and why:
-
-```markdown
-## Checking Workflow Status
-
-To see recent workflow runs in a pull request:
-
-```bash
-gh run list --repo owner/repo --limit 10
-```
-
-This shows the 10 most recent runs with their status and conclusion.
-```
-
-### Use Annotations
-
-Help users understand what to customize:
-
-```bash
-dab add <entity-name> \
-  --source <schema.table> \
-  --permissions "anonymous:read"
-```
-
-Or with comments:
-
-```bash
-# Replace with your database type: mssql, postgresql, mysql
-dab init --database-type mssql \
-  --connection-string "@env('CONNECTION_STRING')"
-```
-
----
-
-## Decision Trees & Conversational Patterns
-
-Skills work best when they guide agents through decision-making.
-
-### Pattern: User Intent Detection
-
-```markdown
-### User says: "add entity" or "add table"
-
-**Ask:**
-1. Entity name? (logical API name)
-2. Source object? (include schema, e.g., `dbo.Products`)
-3. Source type? (`table`, `view`, `stored-procedure`)
-4. Permissions? (at least one `role:actions` pair)
-
-**Then offer:**
-```bash
-dab add Product \
-  --source dbo.Products \
-  --permissions "anonymous:read"
-```
-```
-
-### Pattern: Troubleshooting Flow
-
-```markdown
-### Problem: "Validation failed"
-
-**Troubleshoot in order:**
-1. Check config file exists and is valid JSON
-2. Verify environment variables are set
-3. Test database connectivity
-4. Validate entity names match database objects
-5. Review error output for specific stage failure
-
-**If stage is "permissions":**
-- Check role names match auth provider
-- Verify action names are valid (`create`, `read`, `update`, `delete`, `*`)
-```
-
----
-
-## Including Scripts and Resources
-
-Skills can include supporting files:
-
-```
-.github/skills/database-backup/
-├── SKILL.md
-├── scripts/
-│   ├── backup.sh
-│   ├── restore.sh
-│   └── verify-backup.sh
-├── examples/
-│   └── cron-schedule.txt
-└── README.md
-```
-
-Reference them in your SKILL.md:
-
-```markdown
-## Running Backups
-
-Use the included backup script:
-
-```bash
-./scripts/backup.sh --database mydb --output /backups
-```
-
-See `examples/cron-schedule.txt` for automated scheduling.
-```
-
----
-
-## Skill Activation & Context
-
-### How Copilot Uses Skills
-
-1. User sends a prompt to Copilot
-2. Copilot reads all skill `description` fields
-3. Copilot decides which skills are relevant based on:
-   - Keywords in the prompt
-   - Current task context
-   - Trigger phrases in descriptions
-4. Copilot loads the full `SKILL.md` content into context
-5. Copilot follows the skill's instructions to complete the task
-
-### What Gets Loaded
-
-When a skill is activated:
-- The entire `SKILL.md` file content
-- Any files referenced in the skill directory (if agent requests them)
-
-**Important:** Skills consume context window tokens. Keep them focused and concise.
-
----
-
-## Testing Your Skill
-
-### Validation Checklist
-
-Before committing a skill:
-
-- [ ] Directory name is lowercase with hyphens
-- [ ] Directory name matches `name` in frontmatter
-- [ ] File is named exactly `SKILL.md` (case-sensitive)
-- [ ] YAML frontmatter is first thing in file (no blank lines above)
-- [ ] `name` field is lowercase with hyphens
-- [ ] `description` field clearly states when to use the skill
-- [ ] Content starts with a clear introduction/prelude
-- [ ] Code blocks specify language for syntax highlighting
-- [ ] Examples are complete and runnable
-- [ ] Instructions are clear and actionable
-- [ ] No sensitive data (passwords, API keys, tokens)
-
-### Manual Testing
-
-1. Create a test prompt that should trigger your skill
-2. Ask Copilot to perform the task
-3. Observe if Copilot uses the skill's guidance
-4. Verify the output follows your instructions
-5. Iterate on description and content as needed
-
-### Example Test Prompts
-
-For a skill named `github-actions-debugging`:
-- "Debug the failing CI workflow in this PR"
-- "Why is my GitHub Actions build failing?"
-- "Help me understand this workflow error"
-
-For a skill named `api-testing`:
-- "Create tests for the REST API endpoints"
-- "How do I test the authentication flow?"
-
----
-
-## Common Skill Patterns
-
-### CLI Tool Skill
-
-```markdown
----
-name: tool-name-cli
-description: Guide for using ToolName CLI. Use when working with tool-name commands, configuration, or workflows.
----
-
-# ToolName CLI Guide
-
-## Installation
-
-## Core Commands
-
-### command-name
-**Purpose:** What it does
-
-**Syntax:**
-```bash
-tool command [options]
-```
-
-**Options:** (table of options)
-
-**Examples:**
-
-### command-name-2
-...
-
-## Common Workflows
-
-## Troubleshooting
-```
-
-### Framework Skill
-
-```markdown
----
-name: framework-patterns
-description: Best practices for FrameworkName. Use when building, testing, or debugging FrameworkName applications.
----
-
-# FrameworkName Patterns
-
-## Core Concepts
-
-## Project Structure
-
-## Common Tasks
-
-### Creating Components
-
-### Managing State
-
-### Testing
-
-## Anti-Patterns to Avoid
-
-## Performance Optimization
-```
-
-### Workflow/Process Skill
-
-```markdown
----
-name: process-name
-description: Guide for ProcessName workflow. Use when asked to perform ProcessName tasks.
----
-
-# ProcessName Workflow
-
-## When to Use This Process
-
-## Prerequisites
-
-## Step-by-Step Guide
-
-1. **Step 1:** Do this
-   ```bash
-   command here
-   ```
-   
-2. **Step 2:** Then this
-
-## Validation
-
-## Rollback Procedure
-```
-
----
-
-## Multi-Skill Coordination
-
-When you have related skills, reference them:
-
-```markdown
-## Related Skills
-
-- See `database-migrations` skill for schema change workflows
-- See `api-testing` skill for endpoint validation
-- Refer to custom instructions in `.github/copilot-instructions.md` for coding standards
-```
-
----
-
-## Maintenance & Updates
-
-### When to Update a Skill
-
-- Tool/framework version changes
-- New best practices emerge
-- User feedback reveals gaps
-- Common errors not covered
-
-### Version Notes Section
-
-For tools with version-specific features:
-
-```markdown
-## Version-Specific Features
-
-### v2.0+ Only
-- New feature X
-- Changed behavior Y
-
-### Legacy (v1.x)
-- Old approach (now deprecated)
-```
-
----
-
-## Security Considerations
-
-**Never include in skills:**
-- Passwords or API keys
-- Connection strings with credentials
-- Private repository URLs
-- Personally identifiable information (PII)
-- Proprietary code or algorithms
-
-**Instead:**
-- Use `@env('VARIABLE_NAME')` pattern for secrets
-- Reference credential management systems
-- Link to secure documentation
-- Provide templates with placeholders
-
----
-
-## Example: Complete Minimal Skill
-
-```markdown
----
-name: postgres-backup
-description: Guide for PostgreSQL backup and restore operations. Use when backing up or restoring PostgreSQL databases.
----
-
-# PostgreSQL Backup & Restore
-
-This skill provides commands and workflows for safely backing up and restoring PostgreSQL databases.
-
----
-
-## Backup Commands
-
-### Full Database Backup
-
-```bash
-pg_dump -h localhost -U username -d database_name -F c -f backup_file.dump
-```
-
-Options:
-- `-F c`: Custom format (compressed, recommended)
-- `-F p`: Plain SQL format (human-readable)
-
-### Schema-Only Backup
-
-```bash
-pg_dump -h localhost -U username -d database_name --schema-only -f schema.sql
-```
-
-## Restore Commands
-
-### From Custom Format
-
-```bash
-pg_restore -h localhost -U username -d database_name -F c backup_file.dump
-```
-
-### From SQL File
-
-```bash
-psql -h localhost -U username -d database_name -f backup_file.sql
-```
-
-## Automated Backups
-
-Create a cron job:
-
-```bash
-# Daily backup at 2 AM
-0 2 * * * /usr/bin/pg_dump -h localhost -U postgres -d mydb -F c -f /backups/mydb_$(date +\%Y\%m\%d).dump
-```
-
-## Troubleshooting
-
-### "Permission denied"
-- Verify PostgreSQL user has sufficient privileges
-- Check file system permissions on backup directory
-
-### "Database does not exist"
-- Create target database before restoring: `createdb database_name`
-
-## References
-
-- [PostgreSQL Backup Documentation](https://www.postgresql.org/docs/current/backup.html)
-```
-
----
-
-## Quick Reference: Skill Creation Checklist
-
-When creating a new skill:
-
-1. **Plan**
-   - [ ] Identify specific task/tool the skill covers
-   - [ ] Verify it's not better as a custom instruction
-   - [ ] Choose clear, descriptive name (lowercase-with-hyphens)
-
-2. **Structure**
-   - [ ] Create directory: `.github/skills/<skill-name>/`
-   - [ ] Create file: `SKILL.md` (exactly this name)
-
-3. **Frontmatter**
-   - [ ] Add YAML frontmatter (no blank lines before `---`)
-   - [ ] Set `name` (lowercase, hyphens, matches directory)
-   - [ ] Set `description` (when to use, 50-150 chars)
-   - [ ] Add `license` if applicable
-
-4. **Content**
-   - [ ] Start with clear introduction/prelude
-   - [ ] Structure with clear headings
-   - [ ] Provide actionable instructions
-   - [ ] Include code examples with language hints
-   - [ ] Add decision trees for complex workflows
-   - [ ] Include troubleshooting section
-   - [ ] Link to official documentation
-
-5. **Quality**
-   - [ ] No sensitive data (secrets, credentials)
-   - [ ] Examples are complete and runnable
-   - [ ] Instructions are clear and specific
-   - [ ] No spelling/grammar errors
-   - [ ] Consistent terminology
-
-6. **Test**
-   - [ ] Create test prompts that should trigger the skill
-   - [ ] Verify Copilot uses the skill appropriately
-   - [ ] Check that instructions produce correct results
-
----
-
-## References
-
-- [GitHub Copilot Agent Skills Documentation](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills)
-- [Agent Skills Open Standard](https://github.com/agentskills/agentskills)
-- [Anthropic Skills Repository](https://github.com/anthropics/skills)
-- [Awesome Copilot Collection](https://github.com/github/awesome-copilot)
+- [Agent Skills docs](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills)
+- [Agent Skills structure and metadata](https://code.visualstudio.com/docs/copilot/customization/agent-skills)

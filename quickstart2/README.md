@@ -51,7 +51,7 @@ flowchart LR
 
 ## Prerequisites
 
-- [.NET 10+ SDK](https://dotnet.microsoft.com/download)
+- [.NET 8 or later](https://dotnet.microsoft.com/download)
 - [Aspire workload](https://learn.microsoft.com/dotnet/aspire/fundamentals/setup-tooling) — `dotnet workload install aspire`
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
@@ -97,8 +97,8 @@ pwsh ./azure-infra/azure-down.ps1
 
 | Quickstart | Inbound | Outbound | Security |
 |------------|---------|----------|----------|
-| [Quickstart 1](https://github.com/Azure-Samples/data-api-builder-2.x-sql-quickstart-01-inbound-anonymous-outbound-sql-auth) | Anonymous | SQL Auth | — |
+| [Quickstart 1](https://github.com/Azure-Samples/dab-2.0-quickstart-web_anon-api_anon-db_sql_auth) | Anonymous | SQL Auth | — |
 | **This repo** | Anonymous | Managed Identity | — |
-| [Quickstart 3](https://github.com/Azure-Samples/data-api-builder-2.x-sql-quickstart-03-inbound-entraid-outbound-managed-identity) | Entra ID | Managed Identity | — |
-| [Quickstart 4](https://github.com/Azure-Samples/data-api-builder-2.x-sql-quickstart-04-inbound-entraid-outbound-managed-identity-api-rls) | Entra ID | Managed Identity | API RLS |
-| [Quickstart 5](https://github.com/Azure-Samples/data-api-builder-2.x-sql-quickstart-05-inbound-entraid-outbound-managed-identity-db-rls) | Entra ID | Managed Identity | DB RLS |
+| [Quickstart 3](https://github.com/Azure-Samples/dab-2.0-quickstart-web_anon-api_entra-db_entra) | Entra ID | Managed Identity | — |
+| [Quickstart 4](https://github.com/Azure-Samples/dab-2.0-quickstart-web_entra-api_entra-db_entra-api_rls) | Entra ID | Managed Identity | API RLS |
+| [Quickstart 5](https://github.com/Azure-Samples/dab-2.0-quickstart-web_entra-api_entra-db_entra-db_rls) | Entra ID | Managed Identity | DB RLS |

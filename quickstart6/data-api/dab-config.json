@@ -1,0 +1,124 @@
+{
+  "$schema": "https://github.com/Azure/data-api-builder/releases/download/v1.7.81/dab.draft.schema.json",
+  "data-source": {
+    "database-type": "mssql",
+    "connection-string": "@env('MSSQL_CONNECTION_STRING')",
+    "user-delegated-auth": {
+      "enabled": true,
+      "provider": "EntraId",
+      "database-audience": "https://database.windows.net"
+    }
+  },
+  "runtime": {
+    "rest": {
+      "enabled": true,
+      "path": "/api",
+      "request-body-strict": true
+    },
+    "graphql": {
+      "enabled": true,
+      "path": "/graphql",
+      "allow-introspection": true
+    },
+    "mcp": {
+      "enabled": true,
+      "path": "/mcp"
+    },
+    "host": {
+      "cors": {
+        "origins": [
+          "http://localhost:5173",
+          "https://web-app-202603311750.proudbeach-52a90183.centralus.azurecontainerapps.io"
+        ],
+        "allow-credentials": false
+      },
+      "authentication": {
+        "provider": "EntraId",
+        "jwt": {
+          "audience": "9ec6b567-1f08-40a5-b20a-a18db25d70d4",
+          "issuer": "https://login.microsoftonline.com/eaf341ca-58d3-4d02-93c3-787dfe8e154f/v2.0"
+        }
+      },
+      "mode": "development"
+    },
+    "cache": {
+      "enabled": false
+    }
+  },
+  "autoentities": {},
+  "entities": {
+    "Todos": {
+      "source": {
+        "object": "dbo.Todos",
+        "type": "table"
+      },
+      "graphql": {
+        "enabled": true,
+        "type": {
+          "singular": "Todo",
+          "plural": "Todos"
+        }
+      },
+      "rest": {
+        "enabled": true
+      },
+      "permissions": [
+        {
+          "role": "authenticated",
+          "actions": [
+            {
+              "action": "create"
+            },
+            {
+              "action": "read",
+              "policy": {
+                "database": "@item.Owner eq @claims.preferred_username"
+              }
+            },
+            {
+              "action": "update",
+              "policy": {
+                "database": "@item.Owner eq @claims.preferred_username"
+              }
+            },
+            {
+              "action": "delete",
+              "policy": {
+                "database": "@item.Owner eq @claims.preferred_username"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "WhoAmI": {
+      "source": {
+        "object": "dbo.WhoAmI",
+        "type": "view",
+        "key-fields": [
+          "UserName"
+        ]
+      },
+      "graphql": {
+        "enabled": true,
+        "type": {
+          "singular": "WhoAmI",
+          "plural": "WhoAmI"
+        }
+      },
+      "rest": {
+        "enabled": true
+      },
+      "permissions": [
+        {
+          "role": "authenticated",
+          "actions": [
+            {
+              "action": "read"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -7,6 +7,11 @@ description: Docker Compose orchestration of SQL Server, Data API Builder, SQL C
 
 This skill provides a minimal, repeatable workflow for running **SQL Server**, **Data API Builder (DAB)**, **SQL Commander**, and **MCP Inspector** together in Docker Compose for local development and testing.
 
+## Included script template
+
+- [docker.ps1](./scripts/docker.ps1) — starts compose, waits for SQL health, builds dacpac, and publishes schema.
+  - Use this instead of running `docker compose up -d` alone when schema deployment is required.
+
 ---
 
 ## Core Mental Model

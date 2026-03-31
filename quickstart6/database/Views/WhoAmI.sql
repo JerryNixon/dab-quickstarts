@@ -1,0 +1,2 @@
+CREATE VIEW [dbo].[WhoAmI] AS
+SELECT SUSER_NAME() AS [UserName];
