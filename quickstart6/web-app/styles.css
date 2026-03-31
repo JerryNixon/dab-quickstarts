@@ -81,6 +81,7 @@ header {
     font-size: 0.95rem;
     font-weight: 600;
     font-family: 'Consolas', 'Courier New', monospace;
+    white-space: nowrap;
 }
 
 .add-form {
@@ -127,6 +128,7 @@ header {
     border-radius: 10px;
     box-shadow: 0 10px 40px rgba(0,0,0,0.2);
     overflow: hidden;
+    min-height: 120px;
 }
 
 .task-item {

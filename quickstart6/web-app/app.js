@@ -62,8 +62,7 @@ async function updateIdentity() {
         value.textContent = identity;
         card.style.display = 'block';
         if (currentAccount) {
-            const name = currentAccount.name || currentAccount.username;
-            userInfo.textContent = `${name} (${identity})`;
+            userInfo.textContent = currentAccount.name || currentAccount.username;
         }
     }
 }
