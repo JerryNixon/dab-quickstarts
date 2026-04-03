@@ -8,10 +8,10 @@ The database sees the actual user, not a service account. Validated with a `WhoA
 
 ## What Was Built
 
-**~35 files** across 8 directories, modeled after QS3/QS4 but with critical OBO-specific additions.
+**~35 files** across 8 directories, with critical OBO-specific additions.
 
 ### Database (`database/`)
-- `Tables/Todos.sql` — Same schema as QS4 (TodoId, Title, DueDate, Owner, Completed)
+- `Tables/Todos.sql` — Todo schema (TodoId, Title, DueDate, Owner, Completed)
 - `Views/WhoAmI.sql` — **NEW** `CREATE VIEW [dbo].[WhoAmI] AS SELECT SUSER_NAME() AS [UserName]`
   This is the OBO proof: returns the actual Entra user email when OBO is active, or the SQL admin when it's not.
 - `Scripts/PostDeployment.sql` — Seeds 3 sample todos
@@ -33,7 +33,7 @@ The database sees the actual user, not a service account. Validated with a `WhoA
 - config.js uses `__CLIENT_ID__` / `__TENANT_ID__` placeholders, replaced by `entra-setup.ps1`
 
 ### Aspire AppHost (`aspire-apphost/`)
-- Same structure as QS4 with `qs6-` prefixes
+- Uses `qs6-` prefixes consistently
 - `Demo.cs` checks for placeholder values and offers interactive Entra setup
 - **Key finding**: OBO does NOT work locally with Aspire. Docker SQL Server doesn't accept Entra ID tokens.
   Locally, the app runs with SQL Auth. WhoAmI returns the SQL admin user. OBO activates only on Azure.

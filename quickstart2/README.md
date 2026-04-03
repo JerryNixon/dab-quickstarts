@@ -1,6 +1,6 @@
 # Quickstart 2: Managed Identity
 
-Builds on [Quickstart 1](../quickstart1/) by replacing SQL Auth with **System Assigned Managed Identity (SAMI)** for DAB → Azure SQL. The web app is still anonymous. The API authenticates to SQL using its Azure identity.
+Uses **System Assigned Managed Identity (SAMI)** for DAB → Azure SQL. The web app is anonymous. The API authenticates to SQL using its Azure identity.
 
 This eliminates stored database credentials and is the recommended baseline for production deployments.
 
@@ -64,7 +64,7 @@ dotnet tool restore
 dotnet run --project aspire-apphost
 ```
 
-Locally, DAB uses SQL Auth to talk to the containerized SQL Server — same as Quickstart 1.
+Locally, DAB uses SQL Auth to talk to the containerized SQL Server.
 
 ## Deploy to Azure
 
@@ -85,20 +85,11 @@ To tear down resources:
 pwsh ./azure-infra/azure-down.ps1
 ```
 
-## What Changed from Quickstart 1
+## Key Implementation Files
 
-| File | Change |
-|------|--------|
-| `azure/resources.bicep` | DAB container gets `identity: { type: 'SystemAssigned' }` and uses MI connection string |
+| File | Purpose |
+|------|---------|
+| `azure/resources.bicep` | Configures the DAB container with `identity: { type: 'SystemAssigned' }` and MI connection string |
 | `azure/main.bicep` | Outputs `AZURE_CONTAINER_APP_API_PRINCIPAL_ID` |
-| `azure/post-provision.ps1` | Adds Entra admin + SAMI user creation steps |
+| `azure/post-provision.ps1` | Sets Entra admin and creates the SAMI database user |
 
-## Related Quickstarts
-
-| Quickstart | Inbound | Outbound | Security |
-|------------|---------|----------|----------|
-| [Quickstart 1](https://github.com/Azure-Samples/dab-2.0-quickstart-web_anon-api_anon-db_sql_auth) | Anonymous | SQL Auth | — |
-| **This repo** | Anonymous | Managed Identity | — |
-| [Quickstart 3](https://github.com/Azure-Samples/dab-2.0-quickstart-web_anon-api_entra-db_entra) | Entra ID | Managed Identity | — |
-| [Quickstart 4](https://github.com/Azure-Samples/dab-2.0-quickstart-web_entra-api_entra-db_entra-api_rls) | Entra ID | Managed Identity | API RLS |
-| [Quickstart 5](https://github.com/Azure-Samples/dab-2.0-quickstart-web_entra-api_entra-db_entra-db_rls) | Entra ID | Managed Identity | DB RLS |

@@ -88,6 +88,8 @@ pwsh ./azure-infra/azure-down.ps1
 
 ## Database Schema
 
+Note the `Owner` column in the `Todos` table. This will be important in later quickstarts when we add user identity and row-level security policies.
+
 ```mermaid
 erDiagram
     Todos {
@@ -99,12 +101,3 @@ erDiagram
     }
 ```
 
-## Related Quickstarts
-
-| Quickstart | Inbound | Outbound | Security |
-|------------|---------|----------|----------|
-| **This repo** | Anonymous | SQL Auth | — |
-| [Quickstart 2](https://github.com/Azure-Samples/dab-2.0-quickstart-web_anon-api_anon-db_entra) | Anonymous | Managed Identity | — |
-| [Quickstart 3](https://github.com/Azure-Samples/dab-2.0-quickstart-web_anon-api_entra-db_entra) | Entra ID | Managed Identity | — |
-| [Quickstart 4](https://github.com/Azure-Samples/dab-2.0-quickstart-web_entra-api_entra-db_entra-api_rls) | Entra ID | Managed Identity | API RLS |
-| [Quickstart 5](https://github.com/Azure-Samples/dab-2.0-quickstart-web_entra-api_entra-db_entra-db_rls) | Entra ID | Managed Identity | DB RLS |

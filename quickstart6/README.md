@@ -106,29 +106,19 @@ Server=tcp:<server>.database.windows.net,1433;Database=<db>;Authentication=Activ
 
 DAB 2.0 with OBO uses Azure.Identity (MSI) automatically for health checks and acquires the per-user OBO token for each authenticated request.
 
-## What Changed from Quickstart 4
+## Key Implementation Files
 
-| File | Change |
-|------|--------|
-| `data-api/dab-config.json` | Added `user-delegated-auth` (OBO) under `data-source`; disabled cache; added `WhoAmI` view entity |
-| `database/Views/WhoAmI.sql` | New view: `SELECT SUSER_NAME() AS UserName` |
-| `web-app/index.html` | Added identity badge showing SQL identity; debug log pinned to viewport bottom |
-| `web-app/dab.js` | Added `fetchWhoAmI()` function |
+| File | Purpose |
+|------|---------|
+| `data-api/dab-config.json` | Enables `user-delegated-auth` (OBO) under `data-source`, disables cache, and adds `WhoAmI` view entity |
+| `database/Views/WhoAmI.sql` | Defines `SELECT SUSER_NAME() AS UserName` for identity verification |
+| `web-app/index.html` | Shows identity badge for SQL identity and includes debug log area |
+| `web-app/dab.js` | Implements `fetchWhoAmI()` |
 | `web-app/app.js` | Calls `updateIdentity()` on load and refresh |
-| `azure-infra/entra-setup.ps1` | Creates client secret; adds Azure SQL Database `user_impersonation` permission |
-| `azure-infra/resources.bicep` | DAB uses bare connection string (no `Authentication=`); OBO secrets wired in |
-| `azure-infra/post-provision.ps1` | Grants signed-in user DB access; enables OBO in DAB config; sets OBO env vars; forces revision suffix on image updates |
+| `azure-infra/entra-setup.ps1` | Creates client secret and adds Azure SQL Database `user_impersonation` permission |
+| `azure-infra/resources.bicep` | Uses bare SQL connection string (no `Authentication=`) and wires OBO secrets |
+| `azure-infra/post-provision.ps1` | Grants signed-in user DB access, enables OBO in DAB config, sets OBO env vars, and forces revision suffix on image updates |
 
-## Related Quickstarts
-
-| Quickstart | Inbound | Outbound | Security |
-|------------|---------|----------|----------|
-| [Quickstart 1](https://github.com/Azure-Samples/dab-2.0-quickstart-web_anon-api_anon-db_sql_auth) | Anonymous | SQL Auth | — |
-| [Quickstart 2](https://github.com/Azure-Samples/dab-2.0-quickstart-web_anon-api_anon-db_entra) | Anonymous | Managed Identity | — |
-| [Quickstart 3](https://github.com/Azure-Samples/dab-2.0-quickstart-web_anon-api_entra-db_entra) | Entra ID | Managed Identity | — |
-| [Quickstart 4](https://github.com/Azure-Samples/dab-2.0-quickstart-web_entra-api_entra-db_entra-api_rls) | Entra ID | Managed Identity | API RLS |
-| [Quickstart 5](https://github.com/Azure-Samples/dab-2.0-quickstart-web_entra-api_entra-db_entra-db_rls) | Entra ID | Managed Identity | DB RLS |
-| **This repo** | Entra ID | **OBO** | — |
 
 ## Next Steps
 

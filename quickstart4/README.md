@@ -1,6 +1,6 @@
 # Quickstart 4: User Authentication with DAB Policies
 
-Builds on [Quickstart 3](../quickstart3/) by adding **DAB database policies** that filter data per user. Users authenticate with Microsoft Entra ID. The web app sends a bearer token to DAB. DAB still connects to SQL using SAMI.
+Adds **DAB database policies** that filter data per user. Users authenticate with Microsoft Entra ID. The web app sends a bearer token to DAB. DAB connects to SQL using SAMI.
 
 The difference in this quickstart is policy enforcement inside DAB. The API reads claims from the token and applies database policies to restrict what data a user can access. Each authenticated user only sees their own todos.
 
@@ -68,7 +68,7 @@ dotnet run --project aspire-apphost
 
 On first run, Aspire detects that Entra ID isn't configured and offers to run `azure/entra-setup.ps1` interactively. This creates the app registration, updates `config.js` and `dab-config.json`, then starts normally.
 
-The web app auto-redirects to Microsoft login. Once signed in, all API calls include bearer tokens. Unlike Quickstart 3, each user now only sees rows they own.
+The web app auto-redirects to Microsoft login. Once signed in, all API calls include bearer tokens, and each user only sees rows they own.
 
 ## Deploy to Azure
 
@@ -120,25 +120,16 @@ To restrict access to rows where the Owner matches the user's subject claim:
 }
 ```
 
-## What Changed from Quickstart 3
+## Key Implementation Files
 
-| File | Change |
-|------|--------|
-| `api/dab-config.json` | Changes role from `anonymous` to `authenticated`; adds `policy` to read, update, and delete actions |
-| `web/auth.js` | **New** — MSAL with auto-redirect (no manual login button) |
-| `web/index.html` | Adds MSAL CDN, removes add-form (shows after auth), adds auth.js script |
-| `web/app.js` | Adds `initializeApp()` async init with auth; `updateUI()` for signed-in state |
+| File | Purpose |
+|------|---------|
+| `api/dab-config.json` | Uses `authenticated` role and adds `policy` to read, update, and delete actions |
+| `web/auth.js` | MSAL with auto-redirect (no manual login button) |
+| `web/index.html` | Adds MSAL CDN, delays add-form display until auth, adds `auth.js` script |
+| `web/app.js` | Uses `initializeApp()` async init with auth and `updateUI()` for signed-in state |
 | `web/dab.js` | Sends bearer token with every API call via `getAuthHeaders()` |
-| `web/config.js` | Adds `clientId` and `tenantId` for MSAL configuration |
+| `web/config.js` | Defines `clientId` and `tenantId` for MSAL configuration |
 
-> QS3 had no login at all — the web was fully anonymous. QS4 introduces the entire auth flow: MSAL, auto-redirect, bearer tokens, `authenticated` role, and per-user policies.
+> This quickstart includes the full auth flow: MSAL, auto-redirect, bearer tokens, `authenticated` role, and per-user policies.
 
-## Related Quickstarts
-
-| Quickstart | Inbound | Outbound | Security |
-|------------|---------|----------|----------|
-| [Quickstart 1](https://github.com/Azure-Samples/dab-2.0-quickstart-web_anon-api_anon-db_sql_auth) | Anonymous | SQL Auth | — |
-| [Quickstart 2](https://github.com/Azure-Samples/dab-2.0-quickstart-web_anon-api_anon-db_entra) | Anonymous | Managed Identity | — |
-| [Quickstart 3](https://github.com/Azure-Samples/dab-2.0-quickstart-web_anon-api_entra-db_entra) | Entra ID | Managed Identity | — |
-| **This repo** | Entra ID | Managed Identity | API RLS |
-| [Quickstart 5](https://github.com/Azure-Samples/dab-2.0-quickstart-web_entra-api_entra-db_entra-db_rls) | Entra ID | Managed Identity | DB RLS |
