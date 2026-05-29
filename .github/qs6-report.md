@@ -88,11 +88,11 @@ az containerapp revision restart --name data-api-202603301931 --resource-group r
 
 After the fix:
 - `GET /health` — MSSQL: Healthy (base MSI connection works), entities: Healthy ✅  
-- `GET /api/WhoAmI` (with bearer token) — returns `live.com#jerry@nixoncorp.com` ✅  
+- `GET /api/WhoAmI` (with bearer token) — returns `live.com#user@example.com` ✅  
 - `GET /api/Todos` (with bearer token) — returns user-scoped rows ✅  
 - `POST /api/Todos` — 201 Created ✅  
 - Row-level security (`@item.Owner eq @claims.preferred_username`) — enforced ✅
-- SQL Server identity shown in UI: `live.com#jerry@nixoncorp.com` (the real user, not the MSI) ✅
+- SQL Server identity shown in UI: `live.com#user@example.com` (the real user, not the MSI) ✅
 
 ---
 

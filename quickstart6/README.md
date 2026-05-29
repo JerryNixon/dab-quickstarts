@@ -2,7 +2,7 @@
 
 Demonstrates **On-Behalf-Of (OBO) / user-delegated authentication** in Data API Builder 2.0. Users sign in with Microsoft Entra ID, and DAB exchanges the user's token to connect to Azure SQL **as that user's identity** — not as a service account.
 
-A `WhoAmI` view (`SELECT SUSER_NAME()`) proves that SQL Server sees the real user. The web app shows this identity in a prominent badge: **"SQL Server sees you as: jerry@nixoncorp.com"**.
+A `WhoAmI` view (`SELECT SUSER_NAME()`) proves that SQL Server sees the real user. The web app shows this identity in a prominent badge: **"SQL Server sees you as: user@example.com"**.
 
 ## What You'll Learn
 
@@ -48,7 +48,7 @@ flowchart LR
     U -->|OAuth| W -->|Bearer Token| A -->|OBO Token| S
 ```
 
-> **Why OBO?** Unlike Managed Identity (where SQL sees the app's identity), OBO passes the actual user's identity to the database. SQL Server sees `jerry@nixoncorp.com` — powerful for auditing, row-level security, and SUSER_NAME()-based policies.
+> **Why OBO?** Unlike Managed Identity (where SQL sees the app's identity), OBO passes the actual user's identity to the database. SQL Server sees `user@example.com` — powerful for auditing, row-level security, and SUSER_NAME()-based policies.
 
 ## Prerequisites
 

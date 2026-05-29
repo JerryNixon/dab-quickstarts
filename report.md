@@ -28,7 +28,7 @@ The database sees the actual user, not a service account. Validated with a `WhoA
 
 ### Web App (`web-app/`)
 - MSAL authentication with `access_as_user` scope (acquires token for DAB's API scope)
-- Identity badge shows "SQL Server sees you as: jerry@nixoncorp.com" — visual OBO proof
+- Identity badge shows "SQL Server sees you as: user@example.com" — visual OBO proof
 - `dab.js` includes `fetchWhoAmI()` function calling `/api/WhoAmI`
 - config.js uses `__CLIENT_ID__` / `__TENANT_ID__` placeholders, replaced by `entra-setup.ps1`
 
@@ -68,8 +68,8 @@ The database sees the actual user, not a service account. Validated with a `WhoA
 - **Fix**: Updated Dockerfile to use the GA `latest` image. Health check should show a v2.x runtime such as `2.0.8`
 
 ### 5. azd Auth Mismatch
-- azd was logged in as `jnixon@microsoft.com` but subscription is in `nixoncorp.com` tenant
-- **Fix**: `azd config set auth.useAzCliAuth true` to use az CLI credentials (`jerry@nixoncorp.com`)
+- azd was logged in as `user@contoso.com` but subscription is in `contoso.com` tenant
+- **Fix**: `azd config set auth.useAzCliAuth true` to use az CLI credentials (`user@example.com`)
 
 ## OBO Documentation Validation
 
@@ -122,7 +122,7 @@ The REST endpoints show "Forbidden" because entities require the `authenticated`
 
 1. Open the **Web App** URL
 2. Sign in with your Entra ID account (auto-redirect via MSAL)
-3. Look at the **identity badge** — it should show: "SQL Server sees you as: jerry@nixoncorp.com"
+3. Look at the **identity badge** — it should show: "SQL Server sees you as: user@example.com"
 4. The Todo list should only show items where `Owner` matches your `preferred_username`
 5. In **SQL Commander**, run `SELECT * FROM WhoAmI` — this runs as the MI, so it shows the managed identity name
 6. The difference between steps 3 and 5 proves OBO is working: the web user's identity flows through DAB to SQL
