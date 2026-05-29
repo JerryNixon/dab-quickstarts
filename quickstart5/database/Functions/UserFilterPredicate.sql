@@ -1,3 +1,3 @@
 CREATE FUNCTION dbo.UserFilterPredicate(@OwnerId sysname)
 RETURNS TABLE WITH SCHEMABINDING AS
-RETURN SELECT 1 AS IsVisible WHERE @OwnerId = SUSER_SNAME();
+RETURN SELECT 1 AS IsVisible WHERE @OwnerId = CAST(SESSION_CONTEXT(N'preferred_username') AS sysname);

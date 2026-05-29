@@ -73,7 +73,7 @@ var options = new
 {
     SqlDatabase = "MyDb",
     DabConfig = "dab-config.json",
-    DabImage = "1.7.83-rc",
+    DabImage = "latest",
     SqlCmdrImage = "latest"
 };
 

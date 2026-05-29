@@ -84,7 +84,7 @@ Write-Host "Database user created and granted read/write" -ForegroundColor Green
 # ── 2d. Assign seed data to test user ──
 
 Write-Host "Assigning seed data to test user..." -ForegroundColor Yellow
-$testUserPrincipal = "testuser-$token@$domainName"
+$testUserPrincipal = $currentUser.upn
 $updateSql = "UPDATE [dbo].[Todos] SET [Owner] = '$testUserPrincipal' WHERE [TodoId] IN (1, 2, 3)"
 Invoke-Sqlcmd -ServerInstance $sqlServerFqdn -Database $sqlDb -AccessToken $accessToken -Query $updateSql
 Write-Host "Seed data assigned to $testUserPrincipal" -ForegroundColor Green

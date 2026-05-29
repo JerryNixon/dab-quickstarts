@@ -185,7 +185,7 @@ Nothing is added silently. Every expansion is a conscious, user-approved decisio
 
 ### API
 - **Framework:** Data API Builder (DAB) — no custom API code
-- **Version:** `1.7.83-rc` or later (never `latest`) — MCP requires 1.7+
+- **Version:** GA `latest` image — DAB 2.0.8+ includes MCP and OBO support
 - **Endpoints:** REST enabled by default; GraphQL optional
 - **Configuration:** Use `dab` CLI for all config operations
 - **Data Operations:** MCP enabled by default — prefer MCP over SQLCMD
@@ -353,7 +353,7 @@ erDiagram
 
 **Dockerfile:**
 ```dockerfile
-FROM mcr.microsoft.com/azure-databases/data-api-builder:1.7.83-rc
+FROM mcr.microsoft.com/azure-databases/data-api-builder:latest
 COPY dab-config.json /App/dab-config.json
 ```
 

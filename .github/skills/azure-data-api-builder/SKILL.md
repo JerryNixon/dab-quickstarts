@@ -92,7 +92,7 @@ project/
 ### Dockerfile (DAB Custom Image)
 
 ```dockerfile
-FROM mcr.microsoft.com/azure-databases/data-api-builder:1.7.83-rc
+FROM mcr.microsoft.com/azure-databases/data-api-builder:latest
 COPY dab-config.json /App/dab-config.json
 ```
 
@@ -259,7 +259,7 @@ resource dabApp 'Microsoft.App/containerApps@2024-03-01' = {
       containers: [
         {
           name: 'dab-api'
-          image: 'mcr.microsoft.com/azure-databases/data-api-builder:1.7.83-rc'
+          image: 'mcr.microsoft.com/azure-databases/data-api-builder:latest'
           resources: { cpu: json('0.5'), memory: '1Gi' }
           env: [
             { name: 'MSSQL_CONNECTION_STRING', secretRef: 'db-conn' }

@@ -340,7 +340,7 @@ var sqlDatabaseProject = builder
     .WithReference(sqlDatabase);
 
 var apiServer = builder
-    .AddContainer("data-api", image: "azure-databases/data-api-builder", tag: "1.7.83-rc")
+    .AddContainer("data-api", image: "azure-databases/data-api-builder", tag: "latest")
     .WithImageRegistry("mcr.microsoft.com")
     .WithHttpEndpoint(targetPort: 5000, port: 5000, name: "http")
     .WithEnvironment("MSSQL_CONNECTION_STRING", sqlDatabase)

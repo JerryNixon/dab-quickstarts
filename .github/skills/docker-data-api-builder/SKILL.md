@@ -102,7 +102,7 @@ services:
         condition: service_healthy
 
   api-server:
-    image: mcr.microsoft.com/azure-databases/data-api-builder:1.7.83-rc
+    image: mcr.microsoft.com/azure-databases/data-api-builder:latest
     container_name: api-server
     restart: unless-stopped
     environment:
@@ -150,7 +150,7 @@ Ensure `dab-config.json` enables MCP and uses env vars:
 
 ```json
 {
-  "$schema": "https://github.com/Azure/data-api-builder/releases/download/v1.7.83-rc/dab.draft.schema.json",
+  "$schema": "https://github.com/Azure/data-api-builder/releases/download/v2.0.8/dab.draft.schema.json",
   "data-source": {
     "database-type": "mssql",
     "connection-string": "@env('DATABASE_CONNECTION_STRING')"
