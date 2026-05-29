@@ -23,8 +23,8 @@ The database sees the actual user, not a service account. Validated with a `WhoA
   - `cache.enabled: false` (required when OBO is enabled — tokens are per-user)
   - `WhoAmI` entity (view) with `authenticated` role, read-only
   - `Todos` entity with `@item.Owner eq @claims.preferred_username` policy (users only see their own data)
-- `Dockerfile` — Uses `mcr.microsoft.com/azure-databases/data-api-builder:2.0.0-rc`
-  **Important discovery**: The 1.7.83-rc image does NOT support `user-delegated-auth`. OBO requires DAB 2.0.
+- `Dockerfile` — Uses `mcr.microsoft.com/azure-databases/data-api-builder:latest` (currently v2.0.8 GA)
+  **Important discovery**: Older 1.7 prerelease images do NOT support `user-delegated-auth`. OBO requires DAB 2.0+.
 
 ### Web App (`web-app/`)
 - MSAL authentication with `access_as_user` scope (acquires token for DAB's API scope)
@@ -63,9 +63,9 @@ The database sees the actual user, not a service account. Validated with a `WhoA
 - **Fix**: Removed `--data-source.user-delegated-auth.provider` from post-provision.ps1. The `provider` value is already set in the JSON file.
 
 ### 4. DAB Docker Image Version
-- `mcr.microsoft.com/azure-databases/data-api-builder:1.7.83-rc` throws `Unexpected property user-delegated-auth while deserializing DataSource`
+- Older 1.7 prerelease images throw `Unexpected property user-delegated-auth while deserializing DataSource`
 - OBO is a DAB 2.0 feature, not available in 1.7
-- **Fix**: Updated Dockerfile to use `2.0.0-rc` image. Health check shows `version: 2.0.0`
+- **Fix**: Updated Dockerfile to use the GA `latest` image. Health check should show a v2.x runtime such as `2.0.8`
 
 ### 5. azd Auth Mismatch
 - azd was logged in as `jnixon@microsoft.com` but subscription is in `nixoncorp.com` tenant
@@ -153,7 +153,6 @@ quickstart6/
 ├── azure.yaml
 ├── quickstart6.sln
 ├── README.md
-├── report.md
 ├── aspire-apphost/
 │   ├── Aspire.AppHost.csproj
 │   ├── appsettings.Development.json
