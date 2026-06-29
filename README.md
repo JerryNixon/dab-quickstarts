@@ -1,14 +1,16 @@
 # Data API Builder Quickstarts
 
-Five progressive quickstarts that walk from anonymous access to full row-level enforcement in Azure SQL. Each quickstart is self-contained and can run independently. The architecture evolves step by step, so you can see exactly what changes at each layer.
+Seven quickstarts that walk from anonymous access to full user-delegated enforcement in Azure SQL, then introduce a deployment-focused DAB process sidecar pattern. Each quickstart is self-contained and can run independently. The architecture evolves step by step, so you can see exactly what changes at each layer.
 
 * [Quickstart 1](#quickstart-1-sql-authentication): Inbound anonymous, outbound SQL auth
 * [Quickstart 2](#quickstart-2-managed-identity): Inbound anonymous, outbound managed identity
 * [Quickstart 3](#quickstart-3-securing-the-api): Inbound Entra ID, outbound managed identity
 * [Quickstart 4](#quickstart-4-user-authentication-with-dab-policies): Inbound Entra ID, outbound managed identity, API RLS
 * [Quickstart 5](#quickstart-5-row-level-security): Inbound Entra ID, outbound managed identity, DB RLS
+* [Quickstart 6](#quickstart-6-on-behalf-of-obo-flow): Inbound Entra ID, outbound user-delegated OBO
+* [Quickstart 7](#quickstart-7-dab-process-sidecar): ASP.NET starts DAB as a process sidecar
 
-Each step tightens identity and shifts enforcement closer to the data.
+Quickstarts 1-6 tighten identity and shift enforcement closer to the data. Quickstart 7 is a deployment quickstart that keeps DAB as the API/MCP layer while hosting it as a process owned by the web app.
 
 ## Prerequisites
 
@@ -237,6 +239,52 @@ CREATE SECURITY POLICY UserFilterPolicy
 ADD FILTER PREDICATE dbo.UserFilterPredicate(OwnerId) ON dbo.YourTable
 WITH (STATE = ON);
 ```
+
+## Quickstart 6: On-Behalf-Of (OBO) Flow
+
+> Target repository: coming soon
+
+```mermaid
+flowchart LR
+    U[User]
+
+    subgraph Microsoft Entra
+        E[App Registration]
+    end
+
+    subgraph Azure Container Apps
+        W[Web App]
+        A[Data API builder]
+    end
+
+    subgraph Azure SQL
+        S[(Database)]
+    end
+
+    U <-->|Login| E
+    E -.-> W
+    U -->|OAuth| W -->|Bearer Token| A -->|OBO Token| S
+```
+
+The web app sends the user's bearer token to DAB. DAB exchanges it with Microsoft Entra ID and connects to Azure SQL as the actual user through On-Behalf-Of token flow.
+
+## Quickstart 7: DAB Process Sidecar
+
+> Target repository: coming soon
+
+```mermaid
+flowchart LR
+    U[User]
+    W[ASP.NET Web App]
+    A[Data API builder Process]
+    S[(Database)]
+
+    U --> W
+    W --> A
+    A --> S
+```
+
+This deployment quickstart is not an auth quickstart. The ASP.NET web app includes `dab-config.json`, starts `dab start` as a process sidecar, and proxies DAB endpoints like `/api`, `/graphql`, `/mcp`, `/health`, and `/swagger` through the same web origin. DAB remains the API and MCP layer for SQL.
 
 ## License
 

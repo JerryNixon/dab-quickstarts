@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DAB Sidecar Tasks</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-left">
+                <h1>My Tasks</h1>
+                <p>ASP.NET starts Data API builder as a process sidecar.</p>
+            </div>
+            <div class="header-right">
+                <button class="refresh-btn" id="refreshBtn">↻</button>
+            </div>
+        </header>
+
+        <section class="sidecar-card" id="sidecarStatus">
+            <div class="sidecar-header">
+                <div>
+                    <div class="eyebrow">Data API builder sidecar</div>
+                    <h2 id="dabState">Checking…</h2>
+                </div>
+                <span class="status-pill" id="dabPill">starting</span>
+            </div>
+            <p id="dabMessage">The web app starts and manages DAB automatically.</p>
+            <div class="endpoint-grid">
+                <a href="/swagger" target="_blank" rel="noreferrer">Swagger</a>
+                <a href="/graphql" target="_blank" rel="noreferrer">GraphQL</a>
+                <a href="/health" target="_blank" rel="noreferrer">Health</a>
+                <a href="/api/Todos" target="_blank" rel="noreferrer">REST Todos</a>
+                <a href="/mcp" target="_blank" rel="noreferrer">MCP</a>
+                <a href="/embed" target="_blank" rel="noreferrer">Embed</a>
+            </div>
+            <pre id="dabOutput" class="output" hidden></pre>
+        </section>
+
+        <form class="add-form" id="addForm">
+            <input type="text" id="newTitle" placeholder="What needs to be done?" required>
+            <input type="date" id="newDueDate">
+            <button type="submit" class="add-btn">Add</button>
+        </form>
+
+        <div class="tasks-card" id="tasksList">
+            <!-- Tasks will be rendered here -->
+        </div>
+    </div>
+
+    <script src="dab.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

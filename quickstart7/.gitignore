@@ -1,0 +1,5 @@
+.env
+**/bin
+**/obj
+api-deploy-temp/
+web-deploy-temp/
