@@ -9,13 +9,13 @@ var webProject = Path.Combine(webRoot, "WebApp.csproj");
 
 var options = new
 {
-    SqlServer = "qs7-sql-server",
-    SqlVolume = "qs7-sql-data",
+    SqlServer = "sql-server",
+    SqlVolume = "sql-data",
     SqlDatabase = "TodoDb",
-    SqlProject = "qs7-sql-project",
-    SqlCmdr = "qs7-sql-cmdr",
+    SqlProject = "sql-project",
+    SqlCmdr = "sql-cmdr",
     SqlCmdrImage = "latest",
-    WebApp = "qs7-web-app",
+    WebApp = "web-app",
     WebAppPort = 5173,
     WebAppTargetPort = 5174,
 };
@@ -57,8 +57,8 @@ builder.AddExecutable(options.WebApp, "dotnet", webRoot, "run", "--project", web
         context.Urls.Clear();
         context.Urls.Add(new() { Url = "/", DisplayText = "Web App", Endpoint = context.GetEndpoint("http") });
         context.Urls.Add(new() { Url = "/health", DisplayText = "DAB Health", Endpoint = context.GetEndpoint("http") });
-        context.Urls.Add(new() { Url = "/swagger", DisplayText = "DAB Swagger", Endpoint = context.GetEndpoint("http") });
-        context.Urls.Add(new() { Url = "/graphql", DisplayText = "DAB GraphQL", Endpoint = context.GetEndpoint("http") });
+        context.Urls.Add(new() { Url = "/swagger/", DisplayText = "DAB Swagger", Endpoint = context.GetEndpoint("http") });
+        context.Urls.Add(new() { Url = "/graphql/", DisplayText = "DAB GraphQL", Endpoint = context.GetEndpoint("http") });
     })
     .WaitForCompletion(sqlDatabaseProject);
 

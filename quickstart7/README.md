@@ -56,12 +56,12 @@ Aspire dashboard opens at `http://localhost:15888`. The web app is at `http://lo
 
 The web app starts DAB automatically. The UI includes a **Data API builder sidecar** panel with links to:
 
-- `/swagger`
-- `/graphql`
+- `/swagger/`
+- `/graphql/`
 - `/health`
 - `/api/Todos`
 - `/mcp`
-- `/embed`
+- `/embed/`
 
 ## Deploy to Azure
 

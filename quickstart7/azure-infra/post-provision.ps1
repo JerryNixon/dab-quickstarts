@@ -54,7 +54,7 @@ Write-Host "Web updated" -ForegroundColor Green
 $repoRoot = (Resolve-Path (Join-Path (Get-Location) "..")).Path
 $mcpDir = Join-Path $repoRoot ".github"
 $mcpFile = Join-Path $mcpDir "mcp.json"
-$mcpServerName = "azure-sql-mcp-qs7"
+$mcpServerName = "azure-sql-mcp"
 $mcpUrl = "$webUrl/mcp"
 
 if (-not (Test-Path $mcpDir)) {
@@ -82,7 +82,7 @@ Write-Host "MCP server '$mcpServerName' configured at $mcpUrl" -ForegroundColor 
 Write-Host "`n=== Deployment Complete ===" -ForegroundColor Cyan
 Write-Host "Web + DAB sidecar: $webUrl" -ForegroundColor White
 Write-Host "DAB Health:        $webUrl/health" -ForegroundColor White
-Write-Host "DAB Swagger:       $webUrl/swagger" -ForegroundColor White
-Write-Host "DAB GraphQL:       $webUrl/graphql" -ForegroundColor White
+Write-Host "DAB Swagger:       $webUrl/swagger/" -ForegroundColor White
+Write-Host "DAB GraphQL:       $webUrl/graphql/" -ForegroundColor White
 Write-Host "DAB MCP:           $webUrl/mcp" -ForegroundColor White
 Write-Host "SQL Commander:     https://$sqlCmdrFqdn" -ForegroundColor White

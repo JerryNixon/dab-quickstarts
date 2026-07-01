@@ -37,6 +37,12 @@ static void MapDabProxy(WebApplication app, string pattern)
 {
     app.MapMethods(pattern, ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"], async (HttpContext context, DataApiBuilderService dab, IHttpClientFactory httpClientFactory) =>
     {
+        if (IsUiRootGet(context.Request))
+        {
+            context.Response.Redirect($"{context.Request.Path}/{context.Request.QueryString}", permanent: false);
+            return;
+        }
+
         var status = dab.GetStatus();
         if (!status.Running || string.IsNullOrWhiteSpace(status.BaseUrl))
         {
@@ -95,6 +101,14 @@ static void MapDabProxy(WebApplication app, string pattern)
     });
 }
 
+static bool IsUiRootGet(HttpRequest request)
+{
+    return HttpMethods.IsGet(request.Method)
+        && (request.Path.Equals("/swagger", StringComparison.OrdinalIgnoreCase)
+            || request.Path.Equals("/graphql", StringComparison.OrdinalIgnoreCase)
+            || request.Path.Equals("/embed", StringComparison.OrdinalIgnoreCase));
+}
+
 static string BuildTargetUrl(string baseUrl, PathString path, QueryString query) => $"{baseUrl.TrimEnd('/')}{path}{query}";
 
 static object ToPublicStatus(DataApiBuilderStatus status)
@@ -107,10 +121,10 @@ static object ToPublicStatus(DataApiBuilderStatus status)
         status.BaseUrl,
         healthUrl = "/health",
         restUrl = "/api/Todos",
-        graphqlUrl = "/graphql",
+        graphqlUrl = "/graphql/",
         mcpUrl = "/mcp",
-        embedUrl = "/embed",
-        swaggerUrl = "/swagger",
+        embedUrl = "/embed/",
+        swaggerUrl = "/swagger/",
         status.StartedAt,
         status.ExitCode,
         errorCode = status.ErrorCode?.ToString(),
