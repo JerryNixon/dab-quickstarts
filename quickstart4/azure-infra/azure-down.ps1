@@ -34,7 +34,7 @@ try {
 
     $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "../..")).Path
     $mcpFile = Join-Path $repoRoot ".github/mcp.json"
-    $mcpServerName = "azure-sql-mcp-qs4"
+    $mcpServerName = "azure-sql-mcp"
 
     if (Test-Path $mcpFile) {
         $mcpConfig = Get-Content $mcpFile -Raw | ConvertFrom-Json -AsHashtable

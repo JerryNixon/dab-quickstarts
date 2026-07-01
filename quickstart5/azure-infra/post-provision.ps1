@@ -205,13 +205,13 @@ if (-not $mcpConfig.ContainsKey('servers') -or -not ($mcpConfig['servers'] -is [
     $mcpConfig['servers'] = @{}
 }
 
-$mcpConfig['servers']['azure-sql-mcp-qs5'] = @{
+$mcpConfig['servers']['azure-sql-mcp'] = @{
     type = 'http'
     url = "https://$dabFqdn/mcp"
 }
 
 $mcpConfig | ConvertTo-Json -Depth 100 | Out-File -FilePath $mcpConfigPath -Encoding utf8 -Force
-Write-Host "MCP config updated: azure-sql-mcp-qs5 -> https://$dabFqdn/mcp" -ForegroundColor Green
+Write-Host "MCP config updated: azure-sql-mcp -> https://$dabFqdn/mcp" -ForegroundColor Green
 
 # ── 11. Update local config.js for dev ──
 

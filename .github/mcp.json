@@ -1,6 +1,6 @@
 {
   "servers": {
-    "azure-sql-mcp-qs6": {
+    "azure-sql-mcp": {
       "url": "https://data-api-202603311750.proudbeach-52a90183.centralus.azurecontainerapps.io/mcp",
       "type": "http"
     }

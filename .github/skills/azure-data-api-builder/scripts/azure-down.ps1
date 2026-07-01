@@ -1,10 +1,10 @@
 # Template: tear down quickstart Azure resources
 # Intended location when used: <quickstart>/azure-infra/azure-down.ps1
-# Usage: .\azure-down.ps1 [-NoPurge] [-McpServerName azure-sql-mcp-qs1]
+# Usage: .\azure-down.ps1 [-NoPurge] [-McpServerName azure-sql-mcp]
 
 Param(
     [switch]$NoPurge,
-    [string]$McpServerName = "azure-sql-mcp-qs1"
+    [string]$McpServerName = "azure-sql-mcp"
 )
 
 $ErrorActionPreference = "Stop"

@@ -159,12 +159,12 @@ var sqlCommander = builder
 
 ## Naming Convention
 
-When multiple quickstarts or projects share the same Docker host, use a prefix to avoid container name collisions:
+Each quickstart is a standalone repo, so use simple service names without a numeric prefix:
 
 ```csharp
 var options = new
 {
-    SqlCmdr = "qs1-sql-cmdr",       // quickstart 1
+    SqlCmdr = "sql-cmdr",
     SqlCmdrImage = "latest",
 };
 ```

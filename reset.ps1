@@ -111,11 +111,7 @@ if (Test-Path $mcpFile) {
         $mcpConfig = $raw | ConvertFrom-Json -AsHashtable
         if ($null -ne $mcpConfig -and $mcpConfig.ContainsKey('servers') -and $null -ne $mcpConfig.servers) {
             $keysToRemove = @(
-                'azure-sql-mcp-qs1',
-                'azure-sql-mcp-qs2',
-                'azure-sql-mcp-qs3',
-                'azure-sql-mcp-qs4',
-                'azure-sql-mcp-qs5'
+                'azure-sql-mcp'
             )
 
             foreach ($key in $keysToRemove) {

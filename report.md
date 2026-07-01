@@ -33,7 +33,7 @@ The database sees the actual user, not a service account. Validated with a `WhoA
 - config.js uses `__CLIENT_ID__` / `__TENANT_ID__` placeholders, replaced by `entra-setup.ps1`
 
 ### Aspire AppHost (`aspire-apphost/`)
-- Uses `qs6-` prefixes consistently
+- Uses simple service names (no numeric prefix)
 - `Demo.cs` checks for placeholder values and offers interactive Entra setup
 - **Key finding**: OBO does NOT work locally with Aspire. Docker SQL Server doesn't accept Entra ID tokens.
   Locally, the app runs with SQL Auth. WhoAmI returns the SQL admin user. OBO activates only on Azure.

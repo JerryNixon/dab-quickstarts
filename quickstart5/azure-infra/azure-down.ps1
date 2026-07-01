@@ -41,10 +41,10 @@ try {
         if (-not [string]::IsNullOrWhiteSpace($mcpRaw)) {
             $mcpConfig = $mcpRaw | ConvertFrom-Json -AsHashtable
             if ($mcpConfig -and $mcpConfig.ContainsKey('servers') -and ($mcpConfig['servers'] -is [hashtable])) {
-                if ($mcpConfig['servers'].ContainsKey('azure-sql-mcp-qs5')) {
-                    $null = $mcpConfig['servers'].Remove('azure-sql-mcp-qs5')
+                if ($mcpConfig['servers'].ContainsKey('azure-sql-mcp')) {
+                    $null = $mcpConfig['servers'].Remove('azure-sql-mcp')
                     $mcpConfig | ConvertTo-Json -Depth 100 | Out-File -FilePath $mcpConfigPath -Encoding utf8 -Force
-                    Write-Host "Removed azure-sql-mcp-qs5 from .github/mcp.json" -ForegroundColor Green
+                    Write-Host "Removed azure-sql-mcp from .github/mcp.json" -ForegroundColor Green
                 }
             }
         }

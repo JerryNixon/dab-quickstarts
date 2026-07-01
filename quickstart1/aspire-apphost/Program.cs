@@ -7,15 +7,15 @@ var root = Path.GetFullPath(Path.Combine(builder.AppHostDirectory, @".."));
 
 var options = new
 {
-    SqlServer = "qs1-sql-server",
-    SqlVolume = "qs1-sql-data",
+    SqlServer = "sql-server",
+    SqlVolume = "sql-data",
     SqlDatabase = "TodoDb",
-    DataApi = "qs1-data-api",
+    DataApi = "data-api",
     DabConfig = Path.Combine(root, "data-api", "dab-config.json"),
     DabImage = "latest",
-    SqlCmdr = "qs1-sql-cmdr",
+    SqlCmdr = "sql-cmdr",
     SqlCmdrImage = "latest",
-    WebApp = "qs1-web-app",
+    WebApp = "web-app",
     WebRoot = Path.Combine(root, "web-app"),
 };
 
@@ -30,7 +30,7 @@ var sqlDatabase = sqlServer
     .AddDatabase(options.SqlDatabase);
 
 var sqlDatabaseProject = builder
-    .AddSqlProject<Projects.database>("qs1-sql-project")
+    .AddSqlProject<Projects.database>("sql-project")
     .WithReference(sqlDatabase);
 
 var apiServer = builder

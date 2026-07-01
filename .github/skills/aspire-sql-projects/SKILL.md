@@ -133,7 +133,7 @@ END;
 var sqlDatabase = sqlServer.AddDatabase(options.SqlDatabase);
 
 var sqlDatabaseProject = builder
-    .AddSqlProject<Projects.database>("qs1-sql-project")
+    .AddSqlProject<Projects.database>("sql-project")
     .WithReference(sqlDatabase);
 ```
 
@@ -148,7 +148,7 @@ var sqlDatabase = sqlServer
 // NEW — use SQL Database Project instead
 var sqlDatabase = sqlServer.AddDatabase("TodoDb");
 var sqlDatabaseProject = builder
-    .AddSqlProject<Projects.database>("qs1-sql-project")
+    .AddSqlProject<Projects.database>("sql-project")
     .WithReference(sqlDatabase);
 ```
 
@@ -284,7 +284,7 @@ sqlpackage /Action:Publish `
 3. **Run** — `aspire run` (Aspire rebuilds and redeploys the dacpac automatically)
 4. **Restart DAB** — DAB does not hot-reload schema changes; restart its container:
    ```powershell
-   docker restart qs1-data-api
+   docker restart data-api
    ```
 
 SqlPackage handles all diffs — adding columns, changing types, dropping constraints — without manual migration scripts.

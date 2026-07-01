@@ -173,7 +173,7 @@ Write-Host "Local config.js updated" -ForegroundColor Green
 $repoRoot = (Resolve-Path "$PSScriptRoot/../..").Path
 $githubDir = Join-Path $repoRoot ".github"
 $mcpConfigFile = Join-Path $githubDir "mcp.json"
-$mcpServerName = "azure-sql-mcp-qs3"
+$mcpServerName = "azure-sql-mcp"
 $mcpServerUrl = "https://$dabFqdn/mcp"
 
 if (-not (Test-Path $githubDir)) {

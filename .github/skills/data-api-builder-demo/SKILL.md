@@ -78,10 +78,10 @@ Avoid legacy `aspire-up.ps1` / `aspire-down.ps1` references in docs/scripts.
 
 ### MCP registry key format
 
-Use deterministic quickstart keys (example):
+Use a stable server key (example):
 
 ```json
-"azure-sql-mcp-qs3": { "type": "http", "url": "https://<dab-fqdn>/mcp" }
+"azure-sql-mcp": { "type": "http", "url": "https://<dab-fqdn>/mcp" }
 ```
 
 ## Demo validation checklist

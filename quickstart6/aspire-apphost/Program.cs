@@ -12,15 +12,15 @@ if (!Demo.VerifySetup(root, out var token))
 
 var options = new
 {
-    SqlServer = $"qs6-sql-server-{token}",
-    SqlVolume = $"qs6-sql-data-{token}",
+    SqlServer = $"sql-server-{token}",
+    SqlVolume = $"sql-data-{token}",
     SqlDatabase = "TodoDb",
-    DataApi = $"qs6-data-api-{token}",
+    DataApi = $"data-api-{token}",
     DabConfig = Path.Combine(root, "data-api", "dab-config.json"),
     DabImage = "latest",
-    SqlCmdr = $"qs6-sql-cmdr-{token}",
+    SqlCmdr = $"sql-cmdr-{token}",
     SqlCmdrImage = "latest",
-    WebApp = $"qs6-web-app-{token}",
+    WebApp = $"web-app-{token}",
     WebRoot = Path.Combine(root, "web-app"),
 };
 
@@ -35,7 +35,7 @@ var sqlDatabase = sqlServer
     .AddDatabase(options.SqlDatabase);
 
 var sqlDatabaseProject = builder
-    .AddSqlProject<Projects.database>("qs6-sql-project")
+    .AddSqlProject<Projects.database>("sql-project")
     .WithReference(sqlDatabase);
 
 var apiServer = builder
